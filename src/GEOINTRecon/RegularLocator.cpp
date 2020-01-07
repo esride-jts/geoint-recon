@@ -20,6 +20,7 @@
 // it with ArcGIS Runtime for Qt (or a modified version of that library),
 // containing parts covered by the terms of ArcGIS Runtime for Qt,
 // the licensors of this Program grant you additional permission to convey the resulting work.
+// See <https://developers.arcgis.com/qt/> for further information.
 //
 
 #include "RegularLocator.h"
