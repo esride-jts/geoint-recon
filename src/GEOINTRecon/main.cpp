@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 
 //------------------------------------------------------------------------------
 
@@ -54,6 +55,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain(kOrganizationDomain);
 #endif
     QSettings::setDefaultFormat(kSettingsFormat);
+
+    // Set the styling
+    QQuickStyle::setStyle("Material");
 
     // Before initializing ArcGIS Runtime, first set the
     // ArcGIS Runtime license setting required for your application.
