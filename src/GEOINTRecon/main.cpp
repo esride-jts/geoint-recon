@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 
 //------------------------------------------------------------------------------
 
@@ -78,6 +79,9 @@ int main(int argc, char *argv[])
 
     // Register the GEOINTRecon (QQuickItem) for QML
     qmlRegisterType<GEOINTRecon>("Esri.GEOINTRecon", 1, 0, "GEOINTRecon");
+
+    // Activate the styling
+    QQuickStyle::setStyle("Material");
 
     // Initialize application view
     QQmlApplicationEngine engine;

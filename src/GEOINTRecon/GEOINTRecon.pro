@@ -16,7 +16,7 @@ TEMPLATE = app
 CONFIG += c++11
 
 # additional modules are pulled in via arcgisruntime.pri
-QT += opengl qml quick
+QT += opengl qml quick quickcontrols2
 
 TARGET = GEOINTRecon
 

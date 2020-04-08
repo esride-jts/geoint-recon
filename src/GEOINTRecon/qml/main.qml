@@ -11,7 +11,9 @@
 // See the Sample code usage restrictions document for further information.
 //
 
+import QtQuick 2.2
 import QtQuick.Controls 2.2
+import QtQuick.Controls.Material 2.2
 import Esri.GEOINTRecon 1.0
 
 ApplicationWindow {
@@ -19,7 +21,25 @@ ApplicationWindow {
     width: 800
     height: 600
 
+    Material.theme: Material.Dark
+    Material.accent: "#a7ad6d"      // BW Hellgrün
+    //Material.accent: "#616847"      // BW Helloliv
+    Material.background: "#312d2a"  // BW Schwarz
+    Material.foreground: "#d3c2a6"  // BW Beige
+    Material.primary: "#434a39"     // BW Dunkelgrün
+
+    Column {
+        anchors.centerIn: parent
+
+        RadioButton { text: qsTr("Small") }
+        RadioButton { text: qsTr("Medium");  checked: true }
+        RadioButton { text: qsTr("Large") }
+        TextField { text: qsTr("Panzer Hurra!") }
+    }
+
+    /*
     GEOINTReconForm {
         anchors.fill: parent
     }
+    */
 }
