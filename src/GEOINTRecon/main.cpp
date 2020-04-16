@@ -20,6 +20,7 @@
 
 #include "ArcGISRuntimeEnvironment.h"
 #include "MapQuickView.h"
+#include "MobilePackageStore.h"
 
 #include <QDir>
 #include <QGuiApplication>
@@ -110,6 +111,14 @@ int main(int argc, char *argv[])
     // Set the source
     engine.load(QUrl(kApplicationSourceUrl));
 
+    // Try loading the packages
+    MobilePackageStore store;
+    QFileInfoList packageInfos = store.packageInfos();
+    for (int index = 0; index < packageInfos.size(); index++)
+    {
+        QFileInfo packageInfo = packageInfos.at(index);
+        qDebug() << packageInfo.size();
+    }
     return app.exec();
 }
 
