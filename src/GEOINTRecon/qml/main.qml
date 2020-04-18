@@ -14,6 +14,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
+import QtQuick.Layouts 1.2
 import Esri.GEOINTRecon 1.0
 
 ApplicationWindow {
@@ -32,7 +33,7 @@ ApplicationWindow {
         id: packageModel
         ListElement {
             title: "Incidents analysis"
-            description: "..."
+            description: "The Incident Analysis template is an Esri Defense and Intelligence template containing maps and tools that can be used to perform pattern and trend analysis."
         }
         ListElement {
             title: "Hot-cold spot analysis"
@@ -62,25 +63,42 @@ ApplicationWindow {
             Item {
                 id: pageItem
 
-                Button {
-                    text: "<"
-                    enabled: 0 < index
-                    onClicked: swipeView.decrementCurrentIndex()
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: 10
 
-                Label {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: model.title
-                }
+                    Button {
+                        text: "<"
+                        enabled: 0 < index
+                        onClicked: swipeView.decrementCurrentIndex()
+                        anchors.left: parent.left
+                    }
 
-                Button {
-                    text: ">"
-                    enabled: index < swipeView.count - 1
-                    onClicked: swipeView.incrementCurrentIndex()
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
+                    Column {
+                        Layout.fillWidth: true
+                        spacing: 10
+
+                        Label {
+                            text: model.title
+                            horizontalAlignment: "AlignHCenter"
+                            width: parent.width
+                            font.bold: true
+                        }
+                        Label {
+                            text: model.description
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            font.italic: true
+                            font.pixelSize: font.pixelSize
+                        }
+                    }
+
+                    Button {
+                        text: ">"
+                        enabled: index < swipeView.count - 1
+                        onClicked: swipeView.incrementCurrentIndex()
+                        anchors.right: parent.right
+                    }
                 }
             }
         }
