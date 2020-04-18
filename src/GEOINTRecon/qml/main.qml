@@ -28,6 +28,19 @@ ApplicationWindow {
     Material.foreground: "#d3c2a6"  // BW Beige
     Material.primary: "#434a39"     // BW Dunkelgrün
 
+    ListModel {
+        id: packageModel
+        ListElement {
+            title: "Incidents analysis"
+            description: "..."
+        }
+        ListElement {
+            title: "Hot-cold spot analysis"
+            description: "..."
+        }
+    }
+
+    /*
     Column {
         anchors.centerIn: parent
 
@@ -35,6 +48,42 @@ ApplicationWindow {
         RadioButton { text: qsTr("Medium");  checked: true }
         RadioButton { text: qsTr("Large") }
         TextField { text: qsTr("Panzer Hurra!") }
+    }
+    */
+
+    SwipeView {
+        anchors.fill: parent
+
+        id: swipeView
+
+        Repeater {
+            model: packageModel
+
+            Item {
+                id: pageItem
+
+                Button {
+                    text: "<"
+                    enabled: 0 < index
+                    onClicked: swipeView.decrementCurrentIndex()
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: model.title
+                }
+
+                Button {
+                    text: ">"
+                    enabled: index < swipeView.count - 1
+                    onClicked: swipeView.incrementCurrentIndex()
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
     }
 
     /*
