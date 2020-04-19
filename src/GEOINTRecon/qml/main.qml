@@ -38,11 +38,25 @@ ApplicationWindow {
     PackageView {
         id: packageView
 
-        Component.onCompleted: packageView.onShowMapPackage.connect(showMapPackage)
+        Component.onCompleted: {
+            packageView.onShowMapPackage.connect(showMapPackage);
+            mapView.onNavigateHome.connect(navigateHome);
+        }
+
+        function navigateHome() {
+            stackView.pop();
+        }
 
         function showMapPackage(mapPackagePath) {
-            console.log(mapPackagePath);
+            //console.log(mapPackagePath);
+            //stackView.push("qrc:/qml/GEOINTReconForm.qml");
+            stackView.push(mapView);
         }
+    }
+
+    GEOINTReconForm {
+        id: mapView
+        visible: false
     }
 
     /*
