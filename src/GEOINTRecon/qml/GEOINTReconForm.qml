@@ -38,10 +38,18 @@ Item {
         // Create MapQuickView here, and create its Map etc. in C++ code
         MapView {
             id: view
-            height: parent.height - titleLabel.height - backButton.height - 2 * rootColumn.spacing
+            height: parent.height - titleLabel.height - locateButton.height - backButton.height - 2 * rootColumn.spacing
             width: parent.width
             // set focus to enable keyboard navigation
             focus: true
+        }
+
+        Button {
+            id: locateButton
+            text: "Locate"
+            width: parent.width
+
+            onClicked: model.centerMap("33UUT 10031 45848")
         }
 
         Button {

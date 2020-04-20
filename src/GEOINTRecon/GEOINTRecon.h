@@ -35,6 +35,8 @@ public:
     explicit GEOINTRecon(QObject* parent = nullptr);
     ~GEOINTRecon() override;
 
+    Q_INVOKABLE void centerMap(const QString &location);
+
 signals:
     void mapViewChanged();
 

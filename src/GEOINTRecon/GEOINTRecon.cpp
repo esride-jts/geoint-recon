@@ -17,6 +17,8 @@
 #include "Map.h"
 #include "MapQuickView.h"
 
+#include "RegularLocator.h"
+
 #include <QUrl>
 
 using namespace Esri::ArcGISRuntime;
@@ -48,4 +50,17 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
     m_mapView->setMap(m_map);
 
     emit mapViewChanged();
+}
+
+void GEOINTRecon::centerMap(const QString &location)
+{
+    RegularLocator locator;
+    WGS84Location wgs84Location = locator.locate(location);
+    if (wgs84Location.empty())
+    {
+        return;
+    }
+
+    Point mapCenter(wgs84Location.longitude(), wgs84Location.latitude(), SpatialReference::wgs84());
+    m_mapView->setViewpointCenter(mapCenter);
 }
