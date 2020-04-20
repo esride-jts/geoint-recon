@@ -35,10 +35,12 @@ include($$PWD/arcgisruntime.pri)
 HEADERS += \
     AppInfo.h \
     GEOINTRecon.h \
+    GeointApi.h \
     MobilePackageStore.h \
     RegularLocator.h
 
 SOURCES += \
+    GeointApi.cpp \
     MobilePackageStore.cpp \
     RegularLocator.cpp \
     main.cpp \

@@ -25,7 +25,28 @@
 
 #include "RegularLocator.h"
 
+#include <CoordinateFormatter.h>
+#include <QRegularExpression>
+
+using namespace Esri::ArcGISRuntime;
+
 RegularLocator::RegularLocator(QObject *parent) : QObject(parent)
 {
 
+}
+
+WGS84Location RegularLocator::locate(const QString &location)
+{
+    QRegularExpression expression("(\\d{1,2})\\s*([a-zA-Z]{1,3})\\s*(\\d*)\\s*(\\d*)");
+    QRegularExpressionMatch match = expression.match(location);
+    if (match.hasMatch())
+    {
+        Point mgrsLocation = CoordinateFormatter::fromMgrs(location, SpatialReference::wgs84(), MgrsConversionMode::Automatic);
+        if (mgrsLocation.isValid())
+        {
+            return WGS84Location(mgrsLocation.y(), mgrsLocation.x());
+        }
+    }
+
+    return WGS84Location();
 }

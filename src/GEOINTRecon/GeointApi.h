@@ -23,23 +23,23 @@
 // See <https://developers.arcgis.com/qt/> for further information.
 //
 
-#ifndef REGULARLOCATOR_H
-#define REGULARLOCATOR_H
+#ifndef GEOINTAPI_H
+#define GEOINTAPI_H
 
-#include <QObject>
+class WGS84Location {
 
-#include "GeointApi.h"
-
-class RegularLocator : public QObject
-{
-    Q_OBJECT
 public:
-    explicit RegularLocator(QObject *parent = nullptr);
+    WGS84Location();
+    WGS84Location(double lat, double lon);
 
-    WGS84Location locate(const QString &location);
+    double latitude() const;
+    double longitude() const;
+    bool empty() const;
 
-signals:
-
+private:
+    double _lat;
+    double _lon;
+    bool _empty;
 };
 
-#endif // REGULARLOCATOR_H
+#endif // GEOINTAPI_H
