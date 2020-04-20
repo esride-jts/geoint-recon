@@ -14,6 +14,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
+import QtQuick.Layouts 1.2
 import Esri.GEOINTRecon 1.0
 
 ApplicationWindow {
@@ -28,6 +29,37 @@ ApplicationWindow {
     Material.foreground: "#d3c2a6"  // BW Beige
     Material.primary: "#434a39"     // BW Dunkelgrün
 
+    StackView {
+        id: stackView
+        initialItem: packageView
+        anchors.fill: parent
+    }
+
+    PackageView {
+        id: packageView
+
+        Component.onCompleted: {
+            packageView.onShowMapPackage.connect(showMapPackage);
+            mapView.onNavigateHome.connect(navigateHome);
+        }
+
+        function navigateHome() {
+            stackView.pop();
+        }
+
+        function showMapPackage(mapPackagePath) {
+            //console.log(mapPackagePath);
+            //stackView.push("qrc:/qml/GEOINTReconForm.qml");
+            stackView.push(mapView);
+        }
+    }
+
+    GEOINTReconForm {
+        id: mapView
+        visible: false
+    }
+
+    /*
     Column {
         anchors.centerIn: parent
 
@@ -36,6 +68,7 @@ ApplicationWindow {
         RadioButton { text: qsTr("Large") }
         TextField { text: qsTr("Panzer Hurra!") }
     }
+    */
 
     /*
     GEOINTReconForm {
