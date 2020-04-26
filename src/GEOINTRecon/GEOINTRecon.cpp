@@ -16,7 +16,9 @@
 #include "Basemap.h"
 #include "Map.h"
 #include "MapQuickView.h"
+#include "MobileMapPackage.h"
 
+#include "MobilePackageStore.h"
 #include "RegularLocator.h"
 
 #include <QUrl>
@@ -47,9 +49,45 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
     }
 
     m_mapView = mapView;
-    m_mapView->setMap(m_map);
 
-    emit mapViewChanged();
+    // Try loading the packages
+    MobilePackageStore store;
+    QFileInfoList packageInfos = store.packageInfos();
+    for (int index = 0; index < packageInfos.size(); index++)
+    {
+        QFileInfo packageInfo = packageInfos.at(index);
+        if (packageInfo.exists())
+        {
+            m_mobileMapPackage = new MobileMapPackage(packageInfo.filePath(), this);
+            if (m_mobileMapPackage
+                && LoadStatus::NotLoaded == m_mobileMapPackage->loadStatus())
+            {
+                connect(m_mobileMapPackage, &MobileMapPackage::loadStatusChanged, [this](LoadStatus loadStatus)
+                {
+                    switch (loadStatus)
+                    {
+                        case LoadStatus::Loaded:
+                            break;
+
+                        default:
+                            return;
+                    }
+
+                    // Update the map views map
+                    // and emit map view changed
+                    Map* firstMap = m_mobileMapPackage->maps().at(0);
+                    m_mapView->setMap(firstMap);
+                    emit mapViewChanged();
+                });
+
+                // Start loading the map package
+                m_mobileMapPackage->load();
+            }
+            break;
+        }
+    }
+
+
 }
 
 void GEOINTRecon::centerMap(const QString &location)
