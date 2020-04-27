@@ -20,6 +20,7 @@ namespace ArcGISRuntime
 {
 class Map;
 class MapQuickView;
+class MobileMapPackage;
 }
 }
 
@@ -46,6 +47,7 @@ private:
 
     Esri::ArcGISRuntime::Map* m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView* m_mapView = nullptr;
+    Esri::ArcGISRuntime::MobileMapPackage* m_mobileMapPackage = nullptr;
 };
 
 #endif // GEOINTRECON_H
