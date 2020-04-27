@@ -20,12 +20,17 @@
 
 #include "ArcGISRuntimeEnvironment.h"
 #include "MapQuickView.h"
+#include "MobileMapPackage.h"
+
+#include "MobilePackageStore.h"
+#include "MobilePackageElement.h"
 
 #include <QDir>
 #include <QGuiApplication>
 #include <QMessageBox>
 #include <QSettings>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include <QQuickStyle>
 
 //------------------------------------------------------------------------------
@@ -82,6 +87,9 @@ int main(int argc, char *argv[])
 
     // Register the GEOINTRecon (QQuickItem) for QML
     qmlRegisterType<GEOINTRecon>("Esri.GEOINTRecon", 1, 0, "GEOINTRecon");
+
+    qmlRegisterType<MobilePackageStore>("Esri.MobilePackageStore", 1, 0, "MobilePackageStore");
+    qmlRegisterType<MobilePackageElement>("Esri.MobilePackageElement", 1, 0, "MobilePackageElement");
 
     // Activate the styling
     QQuickStyle::setStyle("Material");

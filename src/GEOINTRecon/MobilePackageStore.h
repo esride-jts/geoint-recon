@@ -26,19 +26,42 @@
 #ifndef MOBILEPACKAGESTORE_H
 #define MOBILEPACKAGESTORE_H
 
+#include <QAbstractListModel>
 #include <QDir>
+#include <QList>
 #include <QObject>
 
-class MobilePackageStore : public QObject
+class MobilePackageElement;
+
+class MobilePackageStore : public QAbstractListModel
 {
     Q_OBJECT
 public:
     explicit MobilePackageStore(QObject *parent = nullptr);
 
     QFileInfoList packageInfos() const;
+    Q_INVOKABLE MobilePackageElement* packageElement(int row) const;
+    Q_INVOKABLE void setSelectedRowIndex(int row);
+
+    static MobilePackageElement* selectedPackageElement();
+
+    QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
 signals:
+    void onLoaded() const;
 
+private:
+    enum RoleNames {
+        TitleRole = Qt::UserRole + 1,
+        DescriptionRole = Qt::UserRole + 2
+    };
+
+    void loadPackages();
+
+    QList<MobilePackageElement*> m_model;
+    static MobilePackageElement* m_selectedPackageElement;
 };
 
 #endif // MOBILEPACKAGESTORE_H
