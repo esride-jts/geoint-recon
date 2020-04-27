@@ -28,6 +28,8 @@ import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
 import QtQuick.Layouts 1.2
 
+import Esri.MobilePackageStore 1.0
+
 Item {
     id: packageViewRoot
 
@@ -45,13 +47,25 @@ Item {
         }
     }
 
+    MobilePackageStore {
+        id: mobileMapPackageStore
+
+        Component.onCompleted: {
+            mobileMapPackageStore.onLoaded.connect(updatePackageModel);
+        }
+
+        function updatePackageModel() {
+            console.log("Model loaded");
+        }
+    }
+
     SwipeView {
         anchors.fill: parent
-
         id: swipeView
 
         Repeater {
-            model: packageModel
+            id: repeater
+            model: mobileMapPackageStore
 
             Item {
                 id: pageItem
@@ -88,7 +102,10 @@ Item {
                             text: "Show"
                             width: parent.width
 
-                            onClicked: packageViewRoot.onShowMapPackage("...")
+                            onClicked: {
+                                mobileMapPackageStore.setSelectedRowIndex(index);
+                                packageViewRoot.onShowMapPackage("...");
+                            }
                         }
                     }
 

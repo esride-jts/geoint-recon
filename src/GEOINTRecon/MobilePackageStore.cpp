@@ -23,11 +23,23 @@
 // See <https://developers.arcgis.com/qt/> for further information.
 //
 
+#include "MobileMapPackage.h"
+
 #include "MobilePackageStore.h"
+#include "MobilePackageElement.h"
 
-MobilePackageStore::MobilePackageStore(QObject *parent) : QObject(parent)
+using namespace Esri::ArcGISRuntime;
+
+
+
+// Static selected package element
+MobilePackageElement* MobilePackageStore::m_selectedPackageElement = nullptr;
+
+
+
+MobilePackageStore::MobilePackageStore(QObject *parent) : QAbstractListModel(parent)
 {
-
+    loadPackages();
 }
 
 QFileInfoList MobilePackageStore::packageInfos() const
@@ -44,5 +56,112 @@ QFileInfoList MobilePackageStore::packageInfos() const
     else
     {
         return QFileInfoList();
+    }
+}
+
+void MobilePackageStore::loadPackages()
+{
+    // Begin loading into this model
+    beginInsertRows(QModelIndex(), rowCount(), rowCount());
+
+    // Try loading the packages
+    QFileInfoList packageInfos = this->packageInfos();
+    int packageCount = packageInfos.size();
+    for (int index = 0; index < packageCount; index++)
+    {
+        QFileInfo packageInfo = packageInfos.at(index);
+        if (packageInfo.exists())
+        {
+            MobileMapPackage* mobileMapPackage = new MobileMapPackage(packageInfo.filePath());
+            if (mobileMapPackage
+                && LoadStatus::NotLoaded == mobileMapPackage->loadStatus())
+            {
+                connect(mobileMapPackage, &MobileMapPackage::loadStatusChanged, [mobileMapPackage, this, packageCount](LoadStatus loadStatus)
+                {
+                    switch (loadStatus)
+                    {
+                        case LoadStatus::Loaded:
+                            break;
+
+                        default:
+                            return;
+                    }
+
+                    MobilePackageElement* packageElement = new MobilePackageElement(mobileMapPackage);
+                    this->m_model.append(packageElement);
+                    if (packageCount == this->m_model.size())
+                    {
+                        // Emit all mobile map packages loaded
+                        emit onLoaded();
+
+                        // End loading into this model
+                        endInsertRows();
+                    }
+                });
+
+                // Start loading the map package
+                mobileMapPackage->load();
+            }
+        }
+    }
+}
+
+MobilePackageElement* MobilePackageStore::packageElement(int row) const
+{
+    if (row < 0 || m_model.size() <= row)
+    {
+        return nullptr;
+    }
+
+    return m_model.at(row);
+}
+
+void MobilePackageStore::setSelectedRowIndex(int row)
+{
+    if (row < 0 || m_model.size() <= row)
+    {
+        return;
+    }
+
+    m_selectedPackageElement = m_model.at(row);
+}
+
+MobilePackageElement* MobilePackageStore::selectedPackageElement()
+{
+    return m_selectedPackageElement;
+}
+
+QHash<int, QByteArray> MobilePackageStore::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles.insert(RoleNames::TitleRole, QString("title").toUtf8());
+    roles.insert(RoleNames::DescriptionRole, QString("description").toUtf8());
+    return roles;
+}
+
+int MobilePackageStore::rowCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent);
+    return m_model.size();
+}
+
+QVariant MobilePackageStore::data(const QModelIndex &index, int role) const
+{
+    if (index.row() < 0 || m_model.size() <= index.row())
+    {
+        return QVariant();
+    }
+
+    MobilePackageElement* packageElement = m_model.at(index.row());
+    switch (role)
+    {
+        case TitleRole:
+            return packageElement->title();
+
+        case DescriptionRole:
+            return packageElement->description();
+
+        default:
+            return QVariant();
     }
 }
