@@ -42,8 +42,7 @@ public:
     QFileInfoList packageInfos() const;
     Q_INVOKABLE MobilePackageElement* packageElement(int row) const;
     Q_INVOKABLE void setSelectedRowIndex(int row);
-
-    static MobilePackageElement* selectedPackageElement();
+    Q_INVOKABLE MobilePackageElement* selectedPackageElement() const;
 
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -61,7 +60,7 @@ private:
     void loadPackages();
 
     QList<MobilePackageElement*> m_model;
-    static MobilePackageElement* m_selectedPackageElement;
+    MobilePackageElement* m_selectedPackageElement = nullptr;
 };
 
 #endif // MOBILEPACKAGESTORE_H

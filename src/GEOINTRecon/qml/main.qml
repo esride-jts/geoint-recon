@@ -17,6 +17,8 @@ import QtQuick.Controls.Material 2.2
 import QtQuick.Layouts 1.2
 import Esri.GEOINTRecon 1.0
 
+import Esri.MobilePackageElement 1.0
+
 ApplicationWindow {
     visible: true
     width: 800
@@ -47,9 +49,8 @@ ApplicationWindow {
             stackView.pop();
         }
 
-        function showMapPackage(mapPackagePath) {
-            //console.log(mapPackagePath);
-            //stackView.push("qrc:/qml/GEOINTReconForm.qml");
+        function showMapPackage(packageElement) {
+            mapView.showMobilePackageElement(packageElement);
             stackView.push(mapView);
         }
     }
