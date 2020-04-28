@@ -51,22 +51,19 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
 
     m_mapView = mapView;
 
-
-    // Update the map views map
-    // and emit map view changed
-    MobilePackageElement* selectedPackageElement = MobilePackageStore::selectedPackageElement();
-    if (nullptr != selectedPackageElement)
-    {
-        Map* focusMap = selectedPackageElement->focusMap();
-        if (nullptr != focusMap)
-        {
-            m_mapView->setMap(focusMap);
-        }
-    }
-
-    //m_mapView->setMap(m_map);
+    m_mapView->setMap(m_map);
     emit mapViewChanged();
+}
 
+MobilePackageElement* GEOINTRecon::packageElement() const
+{
+    return m_packageElement;
+}
+
+void GEOINTRecon::setPackageElement(MobilePackageElement *packageElement)
+{
+    m_packageElement = packageElement;
+    emit packageElementChanged();
 }
 
 void GEOINTRecon::centerMap(const QString &location)
@@ -80,4 +77,20 @@ void GEOINTRecon::centerMap(const QString &location)
 
     Point mapCenter(wgs84Location.longitude(), wgs84Location.latitude(), SpatialReference::wgs84());
     m_mapView->setViewpointCenter(mapCenter);
+}
+
+void GEOINTRecon::showMap()
+{
+    // Update the map views map
+    // and emit map view changed
+    if (nullptr != m_packageElement)
+    {
+        Map* focusMap = m_packageElement->focusMap();
+        if (nullptr != focusMap)
+        {
+            m_mapView->setMap(focusMap);
+        }
+    }
+
+    emit mapViewChanged();
 }

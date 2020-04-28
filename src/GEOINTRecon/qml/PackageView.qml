@@ -28,12 +28,13 @@ import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
 import QtQuick.Layouts 1.2
 
+import Esri.MobilePackageElement 1.0
 import Esri.MobilePackageStore 1.0
 
 Item {
     id: packageViewRoot
 
-    signal onShowMapPackage(string mapPackagePath)
+    signal onShowMapPackage(MobilePackageElement element)
 
     ListModel {
         id: packageModel
@@ -104,7 +105,7 @@ Item {
 
                             onClicked: {
                                 mobileMapPackageStore.setSelectedRowIndex(index);
-                                packageViewRoot.onShowMapPackage("...");
+                                packageViewRoot.onShowMapPackage(mobileMapPackageStore.selectedPackageElement());
                             }
                         }
                     }

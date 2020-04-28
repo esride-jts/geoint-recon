@@ -30,13 +30,6 @@
 
 using namespace Esri::ArcGISRuntime;
 
-
-
-// Static selected package element
-MobilePackageElement* MobilePackageStore::m_selectedPackageElement = nullptr;
-
-
-
 MobilePackageStore::MobilePackageStore(QObject *parent) : QAbstractListModel(parent)
 {
     loadPackages();
@@ -126,7 +119,7 @@ void MobilePackageStore::setSelectedRowIndex(int row)
     m_selectedPackageElement = m_model.at(row);
 }
 
-MobilePackageElement* MobilePackageStore::selectedPackageElement()
+MobilePackageElement* MobilePackageStore::selectedPackageElement() const
 {
     return m_selectedPackageElement;
 }

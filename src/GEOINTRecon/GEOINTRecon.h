@@ -24,6 +24,8 @@ class MobileMapPackage;
 }
 }
 
+class MobilePackageElement;
+
 #include <QObject>
 
 class GEOINTRecon : public QObject
@@ -31,23 +33,30 @@ class GEOINTRecon : public QObject
     Q_OBJECT
 
     Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView* mapView READ mapView WRITE setMapView NOTIFY mapViewChanged)
+    Q_PROPERTY(MobilePackageElement* packageElement READ packageElement WRITE setPackageElement NOTIFY packageElementChanged)
 
 public:
     explicit GEOINTRecon(QObject* parent = nullptr);
     ~GEOINTRecon() override;
 
     Q_INVOKABLE void centerMap(const QString &location);
+    Q_INVOKABLE void showMap();
 
 signals:
     void mapViewChanged();
+    void packageElementChanged();
 
 private:
     Esri::ArcGISRuntime::MapQuickView* mapView() const;
     void setMapView(Esri::ArcGISRuntime::MapQuickView* mapView);
 
+    MobilePackageElement* packageElement() const;
+    void setPackageElement(MobilePackageElement* packageElement);
+
     Esri::ArcGISRuntime::Map* m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView* m_mapView = nullptr;
     Esri::ArcGISRuntime::MobileMapPackage* m_mobileMapPackage = nullptr;
+    MobilePackageElement* m_packageElement = nullptr;
 };
 
 #endif // GEOINTRECON_H

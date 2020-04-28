@@ -17,10 +17,17 @@ import QtQuick.Controls.Material 2.2
 import QtQuick.Layouts 1.2
 import Esri.GEOINTRecon 1.0
 
+import Esri.MobilePackageElement 1.0
+
 Item {
     id: mapViewRoot
 
     signal onNavigateHome()
+
+    function showMobilePackageElement(packageElement) {
+        model.packageElement = packageElement;
+        model.showMap();
+    }
 
     Column {
         id: rootColumn
