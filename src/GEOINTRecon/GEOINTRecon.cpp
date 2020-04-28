@@ -17,12 +17,16 @@
 #include "Map.h"
 #include "MapQuickView.h"
 #include "MobileMapPackage.h"
+#include "FeatureLayer.h"
+#include "FeatureQueryResult.h"
+#include "FeatureTable.h"
 
 #include "MobilePackageElement.h"
 #include "MobilePackageStore.h"
 #include "RegularLocator.h"
 
 #include <QUrl>
+#include <QUuid>
 
 using namespace Esri::ArcGISRuntime;
 
@@ -89,8 +93,53 @@ void GEOINTRecon::showMap()
         if (nullptr != focusMap)
         {
             m_mapView->setMap(focusMap);
+
+            // Iterate features
+            visitMap(focusMap);
         }
     }
 
     emit mapViewChanged();
+}
+
+void GEOINTRecon::visitMap(Esri::ArcGISRuntime::Map *map) const
+{
+    LayerListModel* layerListModel = map->operationalLayers();
+    for (int index = 0; index < layerListModel->size(); index++)
+    {
+        Layer* layer = layerListModel->at(index);
+        FeatureLayer* featureLayer = dynamic_cast<FeatureLayer*>(layer);
+        if (nullptr != featureLayer)
+        {
+            qDebug() << "Feature Layer: " << featureLayer->name();
+            FeatureTable* table = featureLayer->featureTable();
+            visitFeatureTable(table);
+        }
+    }
+}
+
+void GEOINTRecon::visitFeatureTable(Esri::ArcGISRuntime::FeatureTable *table) const
+{
+    connect(table, &FeatureTable::queryFeaturesCompleted, this, [table](QUuid, FeatureQueryResult* rawQueryResult)
+    {
+        qlonglong geometryCount = 0;
+        QScopedPointer<FeatureQueryResult> queryResult(rawQueryResult);
+        if (queryResult)
+        {
+            FeatureIterator featureIterator = queryResult->iterator();
+            while (featureIterator.hasNext())
+            {
+                QScopedPointer<Feature> feature(featureIterator.next());
+                if (!feature->geometry().isEmpty())
+                {
+                    geometryCount++;
+                }
+            }
+        }
+
+        qDebug() << table->displayName() << " with " << geometryCount << " geometries.";
+    });
+
+    QueryParameters parameters;
+    table->queryFeatures(parameters);
 }

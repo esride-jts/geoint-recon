@@ -54,12 +54,13 @@ QFileInfoList MobilePackageStore::packageInfos() const
 
 void MobilePackageStore::loadPackages()
 {
-    // Begin loading into this model
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-
     // Try loading the packages
     QFileInfoList packageInfos = this->packageInfos();
     int packageCount = packageInfos.size();
+
+    // Begin loading into this model
+    // from 0 to package count exclusive
+    beginInsertRows(QModelIndex(), rowCount(), packageCount - 1);
     for (int index = 0; index < packageCount; index++)
     {
         QFileInfo packageInfo = packageInfos.at(index);

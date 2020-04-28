@@ -18,6 +18,7 @@ namespace Esri
 {
 namespace ArcGISRuntime
 {
+class FeatureTable;
 class Map;
 class MapQuickView;
 class MobileMapPackage;
@@ -52,6 +53,9 @@ private:
 
     MobilePackageElement* packageElement() const;
     void setPackageElement(MobilePackageElement* packageElement);
+
+    void visitMap(Esri::ArcGISRuntime::Map* map) const;
+    void visitFeatureTable(Esri::ArcGISRuntime::FeatureTable* table) const;
 
     Esri::ArcGISRuntime::Map* m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView* m_mapView = nullptr;

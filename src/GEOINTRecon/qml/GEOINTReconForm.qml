@@ -45,7 +45,7 @@ Item {
         // Create MapQuickView here, and create its Map etc. in C++ code
         MapView {
             id: view
-            height: parent.height - titleLabel.height - locateButton.height - backButton.height - 2 * rootColumn.spacing
+            height: parent.height - titleLabel.height - locateButton.height - backButton.height - 3 * rootColumn.spacing
             width: parent.width
             // set focus to enable keyboard navigation
             focus: true
