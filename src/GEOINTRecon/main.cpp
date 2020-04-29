@@ -24,6 +24,7 @@
 
 #include "MobilePackageStore.h"
 #include "MobilePackageElement.h"
+#include "OperationalLayerListModel.h"
 
 #include <QDir>
 #include <QGuiApplication>
@@ -90,6 +91,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<MobilePackageStore>("Esri.MobilePackageStore", 1, 0, "MobilePackageStore");
     qmlRegisterType<MobilePackageElement>("Esri.MobilePackageElement", 1, 0, "MobilePackageElement");
+    qmlRegisterType<OperationalLayerListModel>("Esri.OperationalLayerListModel", 1, 0, "OperationalLayerListModel");
 
     // Activate the styling
     QQuickStyle::setStyle("Material");

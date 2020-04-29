@@ -23,6 +23,7 @@
 
 #include "MobilePackageElement.h"
 #include "MobilePackageStore.h"
+#include "OperationalLayerListModel.h"
 #include "RegularLocator.h"
 
 #include <QException>
@@ -33,7 +34,8 @@ using namespace Esri::ArcGISRuntime;
 
 GEOINTRecon::GEOINTRecon(QObject* parent /* = nullptr */):
     QObject(parent),
-    m_map(new Map(Basemap::openStreetMap(this), this))
+    m_map(new Map(Basemap::openStreetMap(this), this)),
+    m_layerListModel(new OperationalLayerListModel(this))
 {
 }
 
@@ -71,6 +73,16 @@ void GEOINTRecon::setPackageElement(MobilePackageElement *packageElement)
     emit packageElementChanged();
 }
 
+OperationalLayerListModel* GEOINTRecon::layerListModel() const
+{
+    if (nullptr == m_mapView->map())
+    {
+        return nullptr;
+    }
+
+    return m_layerListModel;
+}
+
 void GEOINTRecon::centerMap(const QString &location)
 {
     RegularLocator locator;
@@ -87,7 +99,6 @@ void GEOINTRecon::centerMap(const QString &location)
 void GEOINTRecon::showMap()
 {
     // Update the map views map
-    // and emit map view changed
     if (nullptr != m_packageElement)
     {
         Map* focusMap = m_packageElement->focusMap();
@@ -95,12 +106,20 @@ void GEOINTRecon::showMap()
         {
             m_mapView->setMap(focusMap);
 
+            // Update the layer list model
+            LayerListModel* layerListModel = focusMap->operationalLayers();
+            m_layerListModel->updateModel(layerListModel);
+
             // Iterate features
-            visitMap(focusMap);
+            //visitMap(focusMap);
         }
     }
 
+    // Emit map view changed
     emit mapViewChanged();
+
+    // Emit layer list model changed
+    emit layerListModelChanged();
 }
 
 void GEOINTRecon::visitMap(Esri::ArcGISRuntime::Map *map) const

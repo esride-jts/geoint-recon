@@ -19,6 +19,7 @@ namespace Esri
 namespace ArcGISRuntime
 {
 class FeatureTable;
+class LayerListModel;
 class Map;
 class MapQuickView;
 class MobileMapPackage;
@@ -26,6 +27,7 @@ class MobileMapPackage;
 }
 
 class MobilePackageElement;
+class OperationalLayerListModel;
 
 #include <QObject>
 
@@ -35,6 +37,7 @@ class GEOINTRecon : public QObject
 
     Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView* mapView READ mapView WRITE setMapView NOTIFY mapViewChanged)
     Q_PROPERTY(MobilePackageElement* packageElement READ packageElement WRITE setPackageElement NOTIFY packageElementChanged)
+    Q_PROPERTY(OperationalLayerListModel* layerListModel READ layerListModel NOTIFY layerListModelChanged)
 
 public:
     explicit GEOINTRecon(QObject* parent = nullptr);
@@ -46,6 +49,7 @@ public:
 signals:
     void mapViewChanged();
     void packageElementChanged();
+    void layerListModelChanged();
 
 private:
     Esri::ArcGISRuntime::MapQuickView* mapView() const;
@@ -54,6 +58,8 @@ private:
     MobilePackageElement* packageElement() const;
     void setPackageElement(MobilePackageElement* packageElement);
 
+    OperationalLayerListModel* layerListModel() const;
+
     void visitMap(Esri::ArcGISRuntime::Map* map) const;
     void visitFeatureTable(Esri::ArcGISRuntime::FeatureTable* table) const;
 
@@ -61,6 +67,7 @@ private:
     Esri::ArcGISRuntime::MapQuickView* m_mapView = nullptr;
     Esri::ArcGISRuntime::MobileMapPackage* m_mobileMapPackage = nullptr;
     MobilePackageElement* m_packageElement = nullptr;
+    OperationalLayerListModel* m_layerListModel = nullptr;
 };
 
 #endif // GEOINTRECON_H

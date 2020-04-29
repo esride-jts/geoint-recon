@@ -38,12 +38,14 @@ HEADERS += \
     GeointApi.h \
     MobilePackageElement.h \
     MobilePackageStore.h \
+    OperationalLayerListModel.h \
     RegularLocator.h
 
 SOURCES += \
     GeointApi.cpp \
     MobilePackageElement.cpp \
     MobilePackageStore.cpp \
+    OperationalLayerListModel.cpp \
     RegularLocator.cpp \
     main.cpp \
     GEOINTRecon.cpp

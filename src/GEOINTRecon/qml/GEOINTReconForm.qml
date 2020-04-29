@@ -30,9 +30,8 @@ Item {
     }
 
     ColumnLayout {
-        id: rootColumn
-        anchors.fill: parent
         spacing: 10
+        anchors.fill: parent
 
         Label {
             id: titleLabel
@@ -42,13 +41,38 @@ Item {
             font.bold: true
         }
 
-        // Create MapQuickView here, and create its Map etc. in C++ code
-        MapView {
-            id: view
+        RowLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            // set focus to enable keyboard navigation
-            focus: true
+
+            ListModel {
+                id: layerModel
+                ListElement { title: "1.jpg"; imageName: "flower" }
+                ListElement { title: "2.jpg"; imageName: "house" }
+                ListElement { title: "3.jpg"; imageName: "water" }
+            }
+
+            ListView {
+                model: model.layerListModel
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.maximumWidth: 175
+
+                delegate: Label {
+                    //horizontalAlignment: "AlignHCenter"
+                    Layout.fillWidth: true
+                    text: title
+                }
+            }
+
+            // Create MapQuickView here, and create its Map etc. in C++ code
+            MapView {
+                id: view
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                // set focus to enable keyboard navigation
+                focus: true
+            }
         }
 
         Button {
