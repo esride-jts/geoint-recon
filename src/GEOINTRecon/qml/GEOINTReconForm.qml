@@ -29,7 +29,7 @@ Item {
         model.showMap();
     }
 
-    Column {
+    ColumnLayout {
         id: rootColumn
         anchors.fill: parent
         spacing: 10
@@ -38,15 +38,15 @@ Item {
             id: titleLabel
             text: "Map View of the GEOINT Recon"
             horizontalAlignment: "AlignHCenter"
-            width: parent.width
+            Layout.fillWidth: true
             font.bold: true
         }
 
         // Create MapQuickView here, and create its Map etc. in C++ code
         MapView {
             id: view
-            height: parent.height - titleLabel.height - locateButton.height - backButton.height - 3 * rootColumn.spacing
-            width: parent.width
+            Layout.fillHeight: true
+            Layout.fillWidth: true
             // set focus to enable keyboard navigation
             focus: true
         }
@@ -54,7 +54,7 @@ Item {
         Button {
             id: locateButton
             text: "Locate"
-            width: parent.width
+            Layout.fillWidth: true
 
             onClicked: model.centerMap("33UUT 10031 45848")
         }
@@ -62,7 +62,7 @@ Item {
         Button {
             id: backButton
             text: "Back"
-            width: parent.width
+            Layout.fillWidth: true
 
             onClicked: mapViewRoot.onNavigateHome()
         }
