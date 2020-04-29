@@ -25,6 +25,7 @@
 #include "MobilePackageStore.h"
 #include "RegularLocator.h"
 
+#include <QException>
 #include <QUrl>
 #include <QUuid>
 
@@ -120,24 +121,37 @@ void GEOINTRecon::visitMap(Esri::ArcGISRuntime::Map *map) const
 
 void GEOINTRecon::visitFeatureTable(Esri::ArcGISRuntime::FeatureTable *table) const
 {
-    connect(table, &FeatureTable::queryFeaturesCompleted, this, [table](QUuid, FeatureQueryResult* rawQueryResult)
+    // Create a new instance for managing lambda slots lifetime
+    // This instance is deleted when the signal was fired once!
+    QObject* context = new QObject();
+    connect(table, &FeatureTable::queryFeaturesCompleted, context, [context, table](QUuid, FeatureQueryResult* rawQueryResult)
     {
-        qlonglong geometryCount = 0;
-        QScopedPointer<FeatureQueryResult> queryResult(rawQueryResult);
-        if (queryResult)
+        try
         {
-            FeatureIterator featureIterator = queryResult->iterator();
-            while (featureIterator.hasNext())
+            qlonglong geometryCount = 0;
+            QScopedPointer<FeatureQueryResult> queryResult(rawQueryResult);
+            if (queryResult)
             {
-                QScopedPointer<Feature> feature(featureIterator.next());
-                if (!feature->geometry().isEmpty())
+                FeatureIterator featureIterator = queryResult->iterator();
+                while (featureIterator.hasNext())
                 {
-                    geometryCount++;
+                    QScopedPointer<Feature> feature(featureIterator.next());
+                    if (!feature->geometry().isEmpty())
+                    {
+                        geometryCount++;
+                    }
                 }
             }
+
+            qDebug() << table->displayName() << " with " << geometryCount << " geometries.";
+        }
+        catch (QException& ex)
+        {
+            qCritical() << ex.what();
         }
 
-        qDebug() << table->displayName() << " with " << geometryCount << " geometries.";
+        // Deletion of this instance destroys the registered lambda slot
+        delete context;
     });
 
     QueryParameters parameters;
