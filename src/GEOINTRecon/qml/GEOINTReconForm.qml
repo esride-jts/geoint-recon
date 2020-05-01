@@ -116,7 +116,7 @@ Item {
                 model: model.layerListModel
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.maximumWidth: 300
+                Layout.minimumWidth: 100
                 highlight: Rectangle { color: "#616847"; radius: 5 }
                 focus: true
 
@@ -128,6 +128,8 @@ Item {
                 id: view
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                Layout.preferredHeight: 300
+                Layout.preferredWidth: 300
                 // set focus to enable keyboard navigation
                 focus: true
 

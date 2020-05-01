@@ -132,7 +132,7 @@ void GEOINTRecon::showMap()
     {
         Map* focusMap = m_packageElement->focusMap();
         if (nullptr != focusMap)
-        {
+        {            
             m_mapView->setMap(focusMap);
 
             // Update the layer list model
