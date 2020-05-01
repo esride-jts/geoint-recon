@@ -14,13 +14,14 @@
 #include "GEOINTRecon.h"
 
 #include "Basemap.h"
+#include "CoordinateFormatter.h"
+#include "FeatureLayer.h"
+#include "FeatureQueryResult.h"
+#include "FeatureTable.h"
 #include "Map.h"
 #include "MapQuickView.h"
 #include "MGRSGrid.h"
 #include "MobileMapPackage.h"
-#include "FeatureLayer.h"
-#include "FeatureQueryResult.h"
-#include "FeatureTable.h"
 
 #include "MobilePackageElement.h"
 #include "MobilePackageStore.h"
@@ -65,6 +66,29 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
 
     m_mapView->setMap(m_map);
     emit mapViewChanged();
+}
+
+QString GEOINTRecon::mapCenter() const
+{
+    if (nullptr == m_mapView)
+    {
+        return QString("");
+    }
+
+    Geometry mapCenter = m_mapView->currentViewpoint(ViewpointType::CenterAndScale).targetGeometry();
+    switch (mapCenter.geometryType())
+    {
+    case GeometryType::Point:
+        {
+            Point location = static_cast<Point>(mapCenter);
+            const int mgrsPrecision = 5;
+            return CoordinateFormatter::toMgrs(location, MgrsConversionMode::Automatic, mgrsPrecision, true);
+        }
+        break;
+
+    default:
+        return QString("");
+    }
 }
 
 MobilePackageElement* GEOINTRecon::packageElement() const

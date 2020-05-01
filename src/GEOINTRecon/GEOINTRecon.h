@@ -36,6 +36,8 @@ class GEOINTRecon : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString mapCenter READ mapCenter)
+
     Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView* mapView READ mapView WRITE setMapView NOTIFY mapViewChanged)
     Q_PROPERTY(MobilePackageElement* packageElement READ packageElement WRITE setPackageElement NOTIFY packageElementChanged)
     Q_PROPERTY(OperationalLayerListModel* layerListModel READ layerListModel NOTIFY layerListModelChanged)
@@ -55,6 +57,8 @@ signals:
 private:
     Esri::ArcGISRuntime::MapQuickView* mapView() const;
     void setMapView(Esri::ArcGISRuntime::MapQuickView* mapView);
+
+    QString mapCenter() const;
 
     MobilePackageElement* packageElement() const;
     void setPackageElement(MobilePackageElement* packageElement);

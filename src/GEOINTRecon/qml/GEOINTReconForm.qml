@@ -30,8 +30,8 @@ Item {
     }
 
     ColumnLayout {
-        spacing: 10
         anchors.fill: parent
+        spacing: 10
 
         Label {
             id: titleLabel
@@ -124,15 +124,37 @@ Item {
                 Layout.fillWidth: true
                 // set focus to enable keyboard navigation
                 focus: true
+
+                onViewpointChanged: {
+                    // Update the location using the center of the current map extent
+                    locationTextField.text = model.mapCenter;
+                }
             }
         }
 
-        Button {
-            id: locateButton
-            text: "Locate"
-            Layout.fillWidth: true
+        RowLayout {
+            spacing: 30
 
-            onClicked: model.centerMap("33UUT 10031 45848")
+            TextField {
+                id: locationTextField
+                Layout.fillWidth: true
+                text: "33UUT 10031 45848"
+
+                Keys.onReturnPressed: {
+                    model.centerMap(locationTextField.text);
+                }
+            }
+
+            Button {
+                id: locateButton
+                text: "Locate"
+                Layout.fillWidth: true
+
+                onClicked: {
+                    model.centerMap(locationTextField.text);
+                }
+            }
+
         }
 
         Button {

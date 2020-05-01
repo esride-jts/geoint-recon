@@ -25,7 +25,8 @@
 
 #include "RegularLocator.h"
 
-#include <CoordinateFormatter.h>
+#include "CoordinateFormatter.h"
+
 #include <QRegularExpression>
 
 using namespace Esri::ArcGISRuntime;
