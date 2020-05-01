@@ -36,6 +36,10 @@ Item {
 
     signal onShowMapPackage(MobilePackageElement element)
 
+    Component.onCompleted: {
+        appLabelAnimation.start();
+    }
+
     ListModel {
         id: packageModel
         ListElement {
@@ -60,68 +64,96 @@ Item {
         }
     }
 
-    SwipeView {
+    ColumnLayout {
         anchors.fill: parent
-        id: swipeView
+        anchors.topMargin: 30
 
-        Repeater {
-            id: repeater
-            model: mobileMapPackageStore
+        Label {
+            id: appLabel
+            Layout.fillWidth: true
+            horizontalAlignment: "AlignHCenter"
+            text: "GEOINT Recon"
+            font.bold: true
+            font.pointSize: 32
+            opacity: 0.3
 
-            Item {
-                id: pageItem
+            NumberAnimation {
+                id: appLabelAnimation
+                target: appLabel
+                property: "opacity"
+                from: 0.3
+                to: 1.0
+                duration: 2305
+                easing.type: Easing.InBack
+            }
+        }
 
-                RowLayout {
-                    anchors.fill: parent
-                    spacing: 30
+        SwipeView {
+            id: swipeView
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
-                    Button {
-                        text: "<"
-                        enabled: 0 < index
-                        onClicked: swipeView.decrementCurrentIndex()
-                        Layout.alignment: Qt.AlignLeft
-                    }
+            Repeater {
+                id: repeater
+                model: mobileMapPackageStore
 
-                    ColumnLayout {
-                        //anchors.horizontalCenter: parent.horizontalCenter
-                        Layout.fillWidth: true
+                Item {
+                    id: pageItem
+
+                    RowLayout {
+                        anchors.fill: parent
                         spacing: 30
 
-                        Label {
-                            Layout.fillWidth: true
-                            text: model.title
-                            horizontalAlignment: "AlignHCenter"
-                            font.bold: true
+                        Button {
+                            text: "<"
+                            enabled: 0 < index
+                            onClicked: swipeView.decrementCurrentIndex()
+                            Layout.alignment: Qt.AlignLeft
                         }
 
-                        Label {
+                        ColumnLayout {
+                            //anchors.horizontalCenter: parent.horizontalCenter
                             Layout.fillWidth: true
-                            text: model.description
-                            wrapMode: Text.WordWrap
-                            font.italic: true
-                            font.pixelSize: font.pixelSize
+                            spacing: 30
+
+                            Label {
+                                Layout.fillWidth: true
+                                text: model.title
+                                horizontalAlignment: "AlignHCenter"
+                                font.bold: true
+                            }
+
+                            Label {
+                                Layout.fillWidth: true
+                                text: model.description
+                                wrapMode: Text.WordWrap
+                                font.italic: true
+                                font.pixelSize: font.pixelSize
+                            }
+
+                            Button {
+                                Layout.fillWidth: true
+                                text: "Show"
+                                //width: parent.width
+
+                                onClicked: {
+                                    mobileMapPackageStore.setSelectedRowIndex(index);
+                                    packageViewRoot.onShowMapPackage(mobileMapPackageStore.selectedPackageElement());
+                                }
+                            }
                         }
 
                         Button {
-                            Layout.fillWidth: true
-                            text: "Show"
-                            //width: parent.width
-
-                            onClicked: {
-                                mobileMapPackageStore.setSelectedRowIndex(index);
-                                packageViewRoot.onShowMapPackage(mobileMapPackageStore.selectedPackageElement());
-                            }
+                            text: ">"
+                            enabled: index < swipeView.count - 1
+                            onClicked: swipeView.incrementCurrentIndex()
+                            Layout.alignment: Qt.AlignRight
                         }
-                    }
-
-                    Button {
-                        text: ">"
-                        enabled: index < swipeView.count - 1
-                        onClicked: swipeView.incrementCurrentIndex()
-                        Layout.alignment: Qt.AlignRight
                     }
                 }
             }
         }
     }
+
+
 }
