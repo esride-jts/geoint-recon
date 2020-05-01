@@ -18,6 +18,9 @@ class OperationalLayerListModel : public QAbstractListModel
 public:
     explicit OperationalLayerListModel(QObject *parent = nullptr);
 
+    Q_INVOKABLE bool layerVisibility(int index) const;
+    Q_INVOKABLE void setLayerVisibility(int index, bool visible);
+
     void updateModel(Esri::ArcGISRuntime::LayerListModel* layerListModel);
 
     QHash<int, QByteArray> roleNames() const override;
@@ -26,7 +29,8 @@ public:
 
 private:
     enum RoleNames {
-        TitleRole = Qt::UserRole + 1
+        TitleRole = Qt::UserRole + 1,
+        VisibleRole = Qt::UserRole + 2
     };
 
     Esri::ArcGISRuntime::LayerListModel* m_layerListModel = nullptr;

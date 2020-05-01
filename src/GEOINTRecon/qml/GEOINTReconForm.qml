@@ -46,23 +46,75 @@ Item {
             Layout.fillWidth: true
 
             ListModel {
-                id: layerModel
-                ListElement { title: "1.jpg"; imageName: "flower" }
-                ListElement { title: "2.jpg"; imageName: "house" }
-                ListElement { title: "3.jpg"; imageName: "water" }
+                id: layerModel                
+                ListElement { title: "1.jpg"; visible: true }
+                ListElement { title: "2.jpg"; visible: true }
+                ListElement { title: "3.jpg"; visible: true }
+            }
+
+            Component {
+                id: layerComponent
+
+                Item {
+                    height: layerLabel.height + 20
+                    width: parent.width
+
+                    Component.onCompleted: {
+                        // Initialize the checkbox using the layer visibility
+                        layerCheckbox.checked = layerListView.model.layerVisibility(index);
+                    }
+
+                    RowLayout {
+                        anchors.centerIn: parent
+
+                        CheckBox {
+                            id: layerCheckbox
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    // The user affected click destroys the binding!
+                                    layerCheckbox.checked = !layerCheckbox.checked;
+
+                                    // Directly update the layer visibility using a discret invokable method
+                                    layerListView.model.setLayerVisibility(index, layerCheckbox.checked);
+                                }
+                            }
+                        }
+
+                        Label {
+                            id: layerLabel
+                            text: title
+                        }
+
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                        onClicked: {
+                            if (index === layerListView.currentIndex) {
+                                mouse.accepted = false;
+                            }
+                            else {
+                                layerListView.currentIndex = index;
+                            }
+                        }
+                    }
+                }
             }
 
             ListView {
+                id: layerListView
+                //model: layerModel
                 model: model.layerListModel
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.maximumWidth: 175
+                Layout.maximumWidth: 300
+                highlight: Rectangle { color: "#616847"; radius: 5 }
+                focus: true
 
-                delegate: Label {
-                    //horizontalAlignment: "AlignHCenter"
-                    Layout.fillWidth: true
-                    text: title
-                }
+                delegate: layerComponent
             }
 
             // Create MapQuickView here, and create its Map etc. in C++ code

@@ -1,5 +1,6 @@
 #include "OperationalLayerListModel.h"
 
+#include "Layer.h"
 #include "LayerListModel.h"
 
 #include <QDebug>
@@ -11,17 +12,39 @@ OperationalLayerListModel::OperationalLayerListModel(QObject *parent)
 {
 }
 
+bool OperationalLayerListModel::layerVisibility(int index) const
+{
+    if (index < 0 || rowCount() <= index)
+    {
+        return false;
+    }
+
+    return m_layerListModel->at(index)->isVisible();
+}
+
+void OperationalLayerListModel::setLayerVisibility(int index, bool visible)
+{
+    if (index < 0 || rowCount() <= index)
+    {
+        return;
+    }
+
+    m_layerListModel->at(index)->setVisible(visible);
+}
+
 void OperationalLayerListModel::updateModel(Esri::ArcGISRuntime::LayerListModel *layerListModel)
 {
-    beginInsertRows(QModelIndex(), 0, layerListModel->size() - 1);
+    // Emit reset of this model instance
+    beginResetModel();
     m_layerListModel = layerListModel;
-    endInsertRows();
+    endResetModel();
 }
 
 QHash<int, QByteArray> OperationalLayerListModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles.insert(RoleNames::TitleRole, QString("title").toUtf8());
+    roles.insert(RoleNames::VisibleRole, QString("visible").toUtf8());
     return roles;
 }
 
@@ -52,11 +75,15 @@ QVariant OperationalLayerListModel::data(const QModelIndex &index, int role) con
     }
 
     qDebug() << "Model Index: (" << index.row() << ", " << index.column() << ")";
+    qDebug() << "Role: " << role;
 
     switch (role)
     {
         case TitleRole:
             return m_layerListModel->at(index.row())->name();
+
+        case VisibleRole:
+            return m_layerListModel->at(index.row())->isVisible();
 
         default:
             return QVariant();
