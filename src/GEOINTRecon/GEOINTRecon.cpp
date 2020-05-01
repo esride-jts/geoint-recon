@@ -16,6 +16,7 @@
 #include "Basemap.h"
 #include "Map.h"
 #include "MapQuickView.h"
+#include "MGRSGrid.h"
 #include "MobileMapPackage.h"
 #include "FeatureLayer.h"
 #include "FeatureQueryResult.h"
@@ -57,6 +58,10 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
     }
 
     m_mapView = mapView;
+
+    // Set the MGRS grid
+    m_mgrsGrid = new MGRSGrid(this);
+    m_mapView->setGrid(m_mgrsGrid);
 
     m_mapView->setMap(m_map);
     emit mapViewChanged();

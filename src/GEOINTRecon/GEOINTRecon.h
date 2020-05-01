@@ -22,6 +22,7 @@ class FeatureTable;
 class LayerListModel;
 class Map;
 class MapQuickView;
+class MGRSGrid;
 class MobileMapPackage;
 }
 }
@@ -65,6 +66,7 @@ private:
 
     Esri::ArcGISRuntime::Map* m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView* m_mapView = nullptr;
+    Esri::ArcGISRuntime::MGRSGrid* m_mgrsGrid = nullptr;
     Esri::ArcGISRuntime::MobileMapPackage* m_mobileMapPackage = nullptr;
     MobilePackageElement* m_packageElement = nullptr;
     OperationalLayerListModel* m_layerListModel = nullptr;
