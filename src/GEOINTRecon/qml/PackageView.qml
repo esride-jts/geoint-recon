@@ -83,7 +83,7 @@ Item {
                     }
 
                     ColumnLayout {
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        //anchors.horizontalCenter: parent.horizontalCenter
                         Layout.fillWidth: true
                         spacing: 30
 

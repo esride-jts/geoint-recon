@@ -26,6 +26,14 @@
 #ifndef REGULARLOCATOR_H
 #define REGULARLOCATOR_H
 
+namespace Esri
+{
+namespace ArcGISRuntime
+{
+class LinearUnit;
+}
+}
+
 #include <QObject>
 
 #include "GeointApi.h"
@@ -36,10 +44,13 @@ class RegularLocator : public QObject
 public:
     explicit RegularLocator(QObject *parent = nullptr);
 
-    WGS84Location locate(const QString &location);
+    WGS84Location locate(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
 
 signals:
 
+private:
+    double toDegrees(const QString &direction) const;
+    Esri::ArcGISRuntime::LinearUnit toLinearUnit(const QString &linearUnit, double &conversionFactor) const;
 };
 
 #endif // REGULARLOCATOR_H

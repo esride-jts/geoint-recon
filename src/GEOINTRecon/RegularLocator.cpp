@@ -26,6 +26,7 @@
 #include "RegularLocator.h"
 
 #include "CoordinateFormatter.h"
+#include "GeometryEngine.h"
 
 #include <QRegularExpression>
 
@@ -36,7 +37,7 @@ RegularLocator::RegularLocator(QObject *parent) : QObject(parent)
 
 }
 
-WGS84Location RegularLocator::locate(const QString &location)
+WGS84Location RegularLocator::locate(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
 {
     QRegularExpression expression("(\\d{1,2})\\s*([a-zA-Z]{1,3})\\s*(\\d*)\\s*(\\d*)");
     QRegularExpressionMatch match = expression.match(location);
@@ -45,9 +46,78 @@ WGS84Location RegularLocator::locate(const QString &location)
         Point mgrsLocation = CoordinateFormatter::fromMgrs(location, SpatialReference::wgs84(), MgrsConversionMode::Automatic);
         if (mgrsLocation.isValid())
         {
-            return WGS84Location(mgrsLocation.y(), mgrsLocation.x());
+            QList<Point> mgrsLocations({mgrsLocation});
+            double distanceAsDouble = distance.toDouble();
+            double conversionFactor = 0.0;
+            LinearUnit linearUnitAsUnit = toLinearUnit(linearUnit, conversionFactor);
+            distanceAsDouble *= conversionFactor;
+            double azimuth = toDegrees(direction);
+            AngularUnit angularUnit = AngularUnit::degrees();
+            GeodeticCurveType curveType = GeodeticCurveType::Geodesic;
+            QList<Point> targetLocations = GeometryEngine::moveGeodetic(mgrsLocations, distanceAsDouble, linearUnitAsUnit, azimuth, angularUnit, curveType);
+            Point targetLocation = targetLocations.first();
+            if (targetLocation.isValid())
+            {
+                return WGS84Location(targetLocation.y(), targetLocation.x());
+            }
+            else
+            {
+                return WGS84Location(mgrsLocation.y(), mgrsLocation.x());
+            }
         }
     }
 
     return WGS84Location();
+}
+
+double RegularLocator::toDegrees(const QString &direction) const
+{
+    QList<QString> directions({
+        "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
+    });
+
+    double degreePrecision = 360.0 / directions.size();
+    for (int index = 0; index < directions.size(); index++)
+    {
+        QString knownDirection = directions.at(index);
+        if (0 == knownDirection.compare(direction, Qt::CaseInsensitive))
+        {
+            return index * degreePrecision;
+        }
+    }
+
+    return 0.0;
+}
+
+LinearUnit RegularLocator::toLinearUnit(const QString &linearUnit, double &conversionFactor) const
+{
+    QString linearUnitAsLowerCase = linearUnit.toLower();
+    QMap<QString, LinearUnit> linearUnits({
+        { "ft", LinearUnit::feet() },
+        { "km", LinearUnit::kilometers() },
+        { "m", LinearUnit::meters() },
+        { "mi", LinearUnit::miles() },
+        { "nm", LinearUnit::miles() }
+    });
+
+    QMap<QString, LinearUnit>::iterator knownLinearUnit = linearUnits.find(linearUnitAsLowerCase);
+    if (linearUnits.end() != knownLinearUnit)
+    {
+        if (0 == linearUnitAsLowerCase.compare("nm"))
+        {
+            conversionFactor = 1.15;
+        }
+        else
+        {
+            conversionFactor = 1.0;
+        }
+
+        return knownLinearUnit.value();
+    }
+
+    // Return kilometers default and set the conversion factor 0.0
+    // the calller should multipy this factor with the numeric distance.
+    // in this case the distance should lead to 0.0.
+    conversionFactor = 0.0;
+    return LinearUnit::kilometers();
 }

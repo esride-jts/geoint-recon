@@ -112,10 +112,10 @@ OperationalLayerListModel* GEOINTRecon::layerListModel() const
     return m_layerListModel;
 }
 
-void GEOINTRecon::centerMap(const QString &location)
+void GEOINTRecon::centerMap(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
 {
     RegularLocator locator;
-    WGS84Location wgs84Location = locator.locate(location);
+    WGS84Location wgs84Location = locator.locate(location, distance, linearUnit, direction);
     if (wgs84Location.empty())
     {
         return;

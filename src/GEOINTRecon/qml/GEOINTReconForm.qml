@@ -24,6 +24,11 @@ Item {
 
     signal onNavigateHome()
 
+    function centerMap() {
+        console.log(locationTextField.text, distanceField.text, linearUnitBox.currentText, directionBox.currentText);
+        model.centerMap(locationTextField.text, distanceField.text, linearUnitBox.currentText, directionBox.currentText);
+    }
+
     function showMobilePackageElement(packageElement) {
         model.packageElement = packageElement;
         model.showMap();
@@ -31,6 +36,7 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
+        anchors.margins: 10
         spacing: 10
 
         Label {
@@ -145,13 +151,59 @@ Item {
                 }
             }
 
+            TextField {
+                id: distanceField
+                text: "0"
+                validator: DoubleValidator {
+                    bottom: 0
+                    top: 10000
+                }
+
+                Keys.onReturnPressed: {
+                    centerMap();
+                }
+            }
+
+            ComboBox {
+                id: linearUnitBox
+                model: ListModel {
+                   ListElement { text: "km" }
+                   ListElement { text: "m" }
+                   ListElement { text: "mi" }
+                   ListElement { text: "nm" }
+                   ListElement { text: "ft" }
+                }
+            }
+
+            ComboBox {
+                id: directionBox
+                model: ListModel {
+                   ListElement { text: "N" }
+                   ListElement { text: "NNE" }
+                   ListElement { text: "NE" }
+                   ListElement { text: "ENE" }
+                   ListElement { text: "E" }
+                   ListElement { text: "ESE" }
+                   ListElement { text: "SE" }
+                   ListElement { text: "SSE" }
+                   ListElement { text: "S" }
+                   ListElement { text: "SSW" }
+                   ListElement { text: "SW" }
+                   ListElement { text: "WSW" }
+                   ListElement { text: "W" }
+                   ListElement { text: "WNW" }
+                   ListElement { text: "NW" }
+                   ListElement { text: "NNW" }
+                }
+            }
+
             Button {
                 id: locateButton
                 text: "Locate"
                 Layout.fillWidth: true
 
                 onClicked: {
-                    model.centerMap(locationTextField.text);
+                    centerMap();
                 }
             }
 
