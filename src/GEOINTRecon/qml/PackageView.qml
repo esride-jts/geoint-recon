@@ -73,7 +73,7 @@ Item {
 
                 RowLayout {
                     anchors.fill: parent
-                    spacing: 10
+                    spacing: 30
 
                     Button {
                         text: "<"
@@ -82,26 +82,30 @@ Item {
                         Layout.alignment: Qt.AlignLeft
                     }
 
-                    Column {
+                    ColumnLayout {
+                        anchors.horizontalCenter: parent.horizontalCenter
                         Layout.fillWidth: true
-                        spacing: 10
+                        spacing: 30
 
                         Label {
+                            Layout.fillWidth: true
                             text: model.title
                             horizontalAlignment: "AlignHCenter"
-                            width: parent.width
                             font.bold: true
                         }
+
                         Label {
+                            Layout.fillWidth: true
                             text: model.description
-                            width: parent.width
                             wrapMode: Text.WordWrap
                             font.italic: true
                             font.pixelSize: font.pixelSize
                         }
+
                         Button {
+                            Layout.fillWidth: true
                             text: "Show"
-                            width: parent.width
+                            //width: parent.width
 
                             onClicked: {
                                 mobileMapPackageStore.setSelectedRowIndex(index);
