@@ -117,6 +117,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.minimumWidth: 100
+                Layout.maximumWidth: 300
                 highlight: Rectangle { color: "#616847"; radius: 5 }
                 focus: true
 
