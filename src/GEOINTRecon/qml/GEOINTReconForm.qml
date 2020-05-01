@@ -205,6 +205,10 @@ Item {
                 onClicked: {
                     centerMap();
                 }
+
+                Keys.onReturnPressed: {
+                    centerMap();
+                }
             }
 
         }
