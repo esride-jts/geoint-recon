@@ -65,7 +65,7 @@ Item {
                     }
 
                     RowLayout {
-                        anchors.centerIn: parent
+                        anchors.verticalCenter: parent.verticalCenter
 
                         CheckBox {
                             id: layerCheckbox
