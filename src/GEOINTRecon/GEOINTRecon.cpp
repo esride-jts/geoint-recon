@@ -18,15 +18,19 @@
 #include "FeatureLayer.h"
 #include "FeatureQueryResult.h"
 #include "FeatureTable.h"
+#include "GeometryEngine.h"
 #include "Map.h"
 #include "MapQuickView.h"
 #include "MGRSGrid.h"
 #include "MobileMapPackage.h"
+#include "SimpleFillSymbol.h"
+#include "SimpleRenderer.h"
 
 #include "MobilePackageElement.h"
 #include "MobilePackageStore.h"
 #include "OperationalLayerListModel.h"
 #include "RegularLocator.h"
+#include "ThreatFactory.h"
 
 #include <QException>
 #include <QUrl>
@@ -37,7 +41,8 @@ using namespace Esri::ArcGISRuntime;
 GEOINTRecon::GEOINTRecon(QObject* parent /* = nullptr */):
     QObject(parent),
     m_map(new Map(Basemap::openStreetMap(this), this)),
-    m_layerListModel(new OperationalLayerListModel(this))
+    m_layerListModel(new OperationalLayerListModel(this)),
+    m_threatFactory(new ThreatFactory(this))
 {
 }
 
@@ -123,6 +128,9 @@ void GEOINTRecon::centerMap(const QString &location, const QString &distance, co
 
     Point mapCenter(wgs84Location.longitude(), wgs84Location.latitude(), SpatialReference::wgs84());
     m_mapView->setViewpointCenter(mapCenter);
+
+    // Calculate threats
+    m_threatFactory->calculateThreats(mapCenter);
 }
 
 void GEOINTRecon::showMap()
@@ -139,6 +147,9 @@ void GEOINTRecon::showMap()
             LayerListModel* layerListModel = focusMap->operationalLayers();
             m_layerListModel->updateModel(layerListModel);
 
+            // Setup the result overlay
+            setupResultOverlay();
+
             // Iterate features
             //visitMap(focusMap);
         }
@@ -149,6 +160,12 @@ void GEOINTRecon::showMap()
 
     // Emit layer list model changed
     emit layerListModelChanged();
+}
+
+void GEOINTRecon::setupResultOverlay()
+{
+    m_mapView->graphicsOverlays()->clear();
+    m_threatFactory->setupOverlays(*m_mapView);
 }
 
 void GEOINTRecon::visitMap(Esri::ArcGISRuntime::Map *map) const
@@ -184,9 +201,21 @@ void GEOINTRecon::visitFeatureTable(Esri::ArcGISRuntime::FeatureTable *table) co
                 while (featureIterator.hasNext())
                 {
                     QScopedPointer<Feature> feature(featureIterator.next());
-                    if (!feature->geometry().isEmpty())
+                    Geometry geometry = feature->geometry();
+                    if (!geometry.isEmpty())
                     {
                         geometryCount++;
+
+                        switch (geometry.geometryType())
+                        {
+                        case GeometryType::Point:
+                            {
+                            }
+                            break;
+
+                        default:
+                            break;
+                        }
                     }
                 }
             }

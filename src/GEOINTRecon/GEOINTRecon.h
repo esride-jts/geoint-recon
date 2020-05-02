@@ -29,6 +29,7 @@ class MobileMapPackage;
 
 class MobilePackageElement;
 class OperationalLayerListModel;
+class ThreatFactory;
 
 #include <QObject>
 
@@ -65,6 +66,7 @@ private:
 
     OperationalLayerListModel* layerListModel() const;
 
+    void setupResultOverlay();
     void visitMap(Esri::ArcGISRuntime::Map* map) const;
     void visitFeatureTable(Esri::ArcGISRuntime::FeatureTable* table) const;
 
@@ -74,6 +76,7 @@ private:
     Esri::ArcGISRuntime::MobileMapPackage* m_mobileMapPackage = nullptr;
     MobilePackageElement* m_packageElement = nullptr;
     OperationalLayerListModel* m_layerListModel = nullptr;
+    ThreatFactory* m_threatFactory = nullptr;
 };
 
 #endif // GEOINTRECON_H
