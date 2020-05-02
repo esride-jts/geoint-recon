@@ -216,12 +216,30 @@ Item {
 
         }
 
+        RowLayout {
+            spacing: 30
+
+            Button {
+                text: "IED Threats"
+
+                onClicked: model.calculateThreats()
+                Keys.onReturnPressed: model.calculateThreats()
+            }
+
+            Button {
+                text: "..."
+
+                enabled: false
+            }
+        }
+
         Button {
             id: backButton
             text: "Back"
             Layout.fillWidth: true
 
             onClicked: mapViewRoot.onNavigateHome()
+            Keys.onReturnPressed: mapViewRoot.onNavigateHome()
         }
 
         // Declare the C++ instance which creates the map etc. and supply the view

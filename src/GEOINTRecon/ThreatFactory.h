@@ -11,6 +11,7 @@ class Point;
 }
 }
 
+#include <QMap>
 #include <QObject>
 
 class ThreatFactory : public QObject
@@ -27,6 +28,7 @@ signals:
 
 private:
     Esri::ArcGISRuntime::GraphicsOverlay* m_resultOverlay = nullptr;
+    QMap<QString, double> m_threatEvacuationDistances;
 };
 
 #endif // THREATFACTORY_H

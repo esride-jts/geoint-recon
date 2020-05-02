@@ -117,6 +117,24 @@ OperationalLayerListModel* GEOINTRecon::layerListModel() const
     return m_layerListModel;
 }
 
+void GEOINTRecon::calculateThreats()
+{
+    Geometry mapCenter = m_mapView->currentViewpoint(ViewpointType::CenterAndScale).targetGeometry();
+    switch (mapCenter.geometryType())
+    {
+    case GeometryType::Point:
+        {
+            Point location = static_cast<Point>(mapCenter);
+
+            // Calculate threats
+            m_threatFactory->calculateThreats(location);
+        }
+        break;
+    default:
+        return;
+    }
+}
+
 void GEOINTRecon::centerMap(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
 {
     RegularLocator locator;
@@ -128,9 +146,6 @@ void GEOINTRecon::centerMap(const QString &location, const QString &distance, co
 
     Point mapCenter(wgs84Location.longitude(), wgs84Location.latitude(), SpatialReference::wgs84());
     m_mapView->setViewpointCenter(mapCenter);
-
-    // Calculate threats
-    m_threatFactory->calculateThreats(mapCenter);
 }
 
 void GEOINTRecon::showMap()

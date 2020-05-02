@@ -47,6 +47,7 @@ public:
     explicit GEOINTRecon(QObject* parent = nullptr);
     ~GEOINTRecon() override;
 
+    Q_INVOKABLE void calculateThreats();
     Q_INVOKABLE void centerMap(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
     Q_INVOKABLE void showMap();
 
