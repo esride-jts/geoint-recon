@@ -75,6 +75,12 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
     m_mgrsGrid = new MGRSGrid(this);
     m_mapView->setGrid(m_mgrsGrid);
 
+    // Handle map clicked
+    connect(m_mapView, &MapQuickView::mouseClicked, this, [this](QMouseEvent& mouseEvent) {
+        Point mapPoint(m_mapView->screenToLocation(mouseEvent.x(), mouseEvent.y()));
+        m_mapView->setViewpointCenter(mapPoint);
+    });
+
     m_mapView->setMap(m_map);
     emit mapViewChanged();
 }
