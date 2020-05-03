@@ -65,6 +65,12 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
 
     m_mapView = mapView;
 
+    // Set the background color
+    BackgroundGrid backgroundGrid;
+    backgroundGrid.setColor(QColor("#d3c2a6"));
+    backgroundGrid.setGridLineWidth(0);
+    m_mapView->setBackgroundGrid(backgroundGrid);
+
     // Set the MGRS grid
     m_mgrsGrid = new MGRSGrid(this);
     m_mapView->setGrid(m_mgrsGrid);
@@ -155,7 +161,7 @@ void GEOINTRecon::showMap()
     {
         Map* focusMap = m_packageElement->focusMap();
         if (nullptr != focusMap)
-        {            
+        {
             m_mapView->setMap(focusMap);
 
             // Update the layer list model
