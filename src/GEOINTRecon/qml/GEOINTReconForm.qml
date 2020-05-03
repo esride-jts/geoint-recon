@@ -24,8 +24,11 @@ Item {
 
     signal onNavigateHome()
 
+    function addObservation() {
+        model.addObservation(locationTextField.text, distanceField.text, linearUnitBox.currentText, directionBox.currentText);
+    }
+
     function centerMap() {
-        console.log(locationTextField.text, distanceField.text, linearUnitBox.currentText, directionBox.currentText);
         model.centerMap(locationTextField.text, distanceField.text, linearUnitBox.currentText, directionBox.currentText);
     }
 
@@ -219,6 +222,13 @@ Item {
             Button {
                 text: "Observe"
 
+                onClicked: {
+                    addObservation();
+                }
+
+                Keys.onReturnPressed: {
+                    addObservation();
+                }
             }
         }
 

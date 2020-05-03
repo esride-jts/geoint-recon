@@ -29,6 +29,7 @@
 #include "MobilePackageElement.h"
 #include "MobilePackageStore.h"
 #include "OperationalLayerListModel.h"
+#include "ObservationFactory.h"
 #include "RegularLocator.h"
 #include "ThreatFactory.h"
 
@@ -42,6 +43,7 @@ GEOINTRecon::GEOINTRecon(QObject* parent /* = nullptr */):
     QObject(parent),
     m_map(new Map(Basemap::openStreetMap(this), this)),
     m_layerListModel(new OperationalLayerListModel(this)),
+    m_observationFactory(new ObservationFactory(this)),
     m_threatFactory(new ThreatFactory(this))
 {
 }
@@ -129,6 +131,11 @@ OperationalLayerListModel* GEOINTRecon::layerListModel() const
     return m_layerListModel;
 }
 
+void GEOINTRecon::addObservation(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
+{
+    m_observationFactory->addNewObservation(location, distance, linearUnit, direction);
+}
+
 void GEOINTRecon::calculateThreats()
 {
     Geometry mapCenter = m_mapView->currentViewpoint(ViewpointType::CenterAndScale).targetGeometry();
@@ -174,8 +181,8 @@ void GEOINTRecon::showMap()
             LayerListModel* layerListModel = focusMap->operationalLayers();
             m_layerListModel->updateModel(layerListModel);
 
-            // Setup the result overlay
-            setupResultOverlay();
+            // Setup the overlays
+            setupOverlays();
 
             // Iterate features
             //visitMap(focusMap);
@@ -189,9 +196,11 @@ void GEOINTRecon::showMap()
     emit layerListModelChanged();
 }
 
-void GEOINTRecon::setupResultOverlay()
+void GEOINTRecon::setupOverlays()
 {
     m_mapView->graphicsOverlays()->clear();
+
+    m_observationFactory->setupOverlays(*m_mapView);
     m_threatFactory->setupOverlays(*m_mapView);
 }
 

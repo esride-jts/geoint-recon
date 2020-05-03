@@ -28,6 +28,7 @@
 #include "CoordinateFormatter.h"
 #include "GeometryEngine.h"
 
+#include <QtMath>
 #include <QRegularExpression>
 
 using namespace Esri::ArcGISRuntime;
@@ -68,6 +69,42 @@ WGS84Location RegularLocator::locate(const QString &location, const QString &dis
     }
 
     return WGS84Location();
+}
+
+Esri::ArcGISRuntime::Geometry RegularLocator::locateGeometry(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
+{
+    QRegularExpression expression("(\\d{1,2})\\s*([a-zA-Z]{1,3})\\s*(\\d*)\\s*(\\d*)");
+    QRegularExpressionMatch match = expression.match(location);
+    if (match.hasMatch())
+    {
+        Point mgrsLocation = CoordinateFormatter::fromMgrs(location, SpatialReference::wgs84(), MgrsConversionMode::Automatic);
+        if (mgrsLocation.isValid())
+        {
+            QList<Point> mgrsLocations({mgrsLocation});
+            double distanceAsDouble = distance.toDouble();
+            double conversionFactor = 0.0;
+            LinearUnit linearUnitAsUnit = toLinearUnit(linearUnit, conversionFactor);
+            distanceAsDouble *= conversionFactor;
+            double azimuth = toDegrees(direction);
+            AngularUnit angularUnit = AngularUnit::degrees();
+            GeodeticCurveType curveType = GeodeticCurveType::Geodesic;
+            QList<Point> targetLocations = GeometryEngine::moveGeodetic(mgrsLocations, distanceAsDouble, linearUnitAsUnit, azimuth, angularUnit, curveType);
+            Point targetLocation = targetLocations.first();
+            if (targetLocation.isValid())
+            {
+                const double maxDeviation = 1e-5;
+                double fieldOfView = 214.0;
+                double viewDiameter = 2 * distanceAsDouble * tan(0.5 * fieldOfView);
+                if (viewDiameter < distanceAsDouble)
+                {
+                    viewDiameter = distanceAsDouble;
+                }
+                return GeometryEngine::bufferGeodetic(targetLocation, viewDiameter, linearUnitAsUnit, maxDeviation, GeodeticCurveType::Geodesic);
+            }
+        }
+    }
+
+    return Point();
 }
 
 double RegularLocator::toDegrees(const QString &direction) const

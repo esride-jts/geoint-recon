@@ -29,6 +29,7 @@ class MobileMapPackage;
 
 class MobilePackageElement;
 class OperationalLayerListModel;
+class ObservationFactory;
 class ThreatFactory;
 
 #include <QObject>
@@ -47,6 +48,7 @@ public:
     explicit GEOINTRecon(QObject* parent = nullptr);
     ~GEOINTRecon() override;
 
+    Q_INVOKABLE void addObservation(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
     Q_INVOKABLE void calculateThreats();
     Q_INVOKABLE void centerMap(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
     Q_INVOKABLE void showMap();
@@ -67,7 +69,7 @@ private:
 
     OperationalLayerListModel* layerListModel() const;
 
-    void setupResultOverlay();
+    void setupOverlays();
     void visitMap(Esri::ArcGISRuntime::Map* map) const;
     void visitFeatureTable(Esri::ArcGISRuntime::FeatureTable* table) const;
 
@@ -77,6 +79,7 @@ private:
     Esri::ArcGISRuntime::MobileMapPackage* m_mobileMapPackage = nullptr;
     MobilePackageElement* m_packageElement = nullptr;
     OperationalLayerListModel* m_layerListModel = nullptr;
+    ObservationFactory* m_observationFactory = nullptr;
     ThreatFactory* m_threatFactory = nullptr;
 };
 
