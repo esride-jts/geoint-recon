@@ -38,6 +38,7 @@ HEADERS += \
     GeointApi.h \
     MobilePackageElement.h \
     MobilePackageStore.h \
+    ObservationFactory.h \
     OperationalLayerListModel.h \
     RegularLocator.h \
     ThreatFactory.h
@@ -46,6 +47,7 @@ SOURCES += \
     GeointApi.cpp \
     MobilePackageElement.cpp \
     MobilePackageStore.cpp \
+    ObservationFactory.cpp \
     OperationalLayerListModel.cpp \
     RegularLocator.cpp \
     ThreatFactory.cpp \

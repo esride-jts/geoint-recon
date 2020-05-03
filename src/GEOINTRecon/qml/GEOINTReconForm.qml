@@ -156,6 +156,7 @@ Item {
 
             TextField {
                 id: distanceField
+                Layout.maximumWidth: 100
                 text: "0"
                 validator: DoubleValidator {
                     bottom: 0
@@ -169,6 +170,7 @@ Item {
 
             ComboBox {
                 id: linearUnitBox
+                Layout.maximumWidth: 100
                 model: ListModel {
                    ListElement { text: "km" }
                    ListElement { text: "m" }
@@ -180,6 +182,7 @@ Item {
 
             ComboBox {
                 id: directionBox
+                Layout.maximumWidth: 100
                 model: ListModel {
                    ListElement { text: "N" }
                    ListElement { text: "NNE" }
@@ -203,7 +206,6 @@ Item {
             Button {
                 id: locateButton
                 text: "Locate"
-                Layout.fillWidth: true
 
                 onClicked: {
                     centerMap();
@@ -214,6 +216,10 @@ Item {
                 }
             }
 
+            Button {
+                text: "Observe"
+
+            }
         }
 
         RowLayout {
