@@ -14,17 +14,24 @@
 #include "GEOINTRecon.h"
 
 #include "Basemap.h"
-#include "Map.h"
-#include "MapQuickView.h"
-#include "MobileMapPackage.h"
+#include "CoordinateFormatter.h"
 #include "FeatureLayer.h"
 #include "FeatureQueryResult.h"
 #include "FeatureTable.h"
+#include "GeometryEngine.h"
+#include "Map.h"
+#include "MapQuickView.h"
+#include "MGRSGrid.h"
+#include "MobileMapPackage.h"
+#include "SimpleFillSymbol.h"
+#include "SimpleRenderer.h"
 
 #include "MobilePackageElement.h"
 #include "MobilePackageStore.h"
 #include "OperationalLayerListModel.h"
+#include "ObservationFactory.h"
 #include "RegularLocator.h"
+#include "ThreatFactory.h"
 
 #include <QException>
 #include <QUrl>
@@ -35,7 +42,9 @@ using namespace Esri::ArcGISRuntime;
 GEOINTRecon::GEOINTRecon(QObject* parent /* = nullptr */):
     QObject(parent),
     m_map(new Map(Basemap::openStreetMap(this), this)),
-    m_layerListModel(new OperationalLayerListModel(this))
+    m_layerListModel(new OperationalLayerListModel(this)),
+    m_observationFactory(new ObservationFactory(this)),
+    m_threatFactory(new ThreatFactory(this))
 {
 }
 
@@ -58,8 +67,47 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
 
     m_mapView = mapView;
 
+    // Set the background color
+    BackgroundGrid backgroundGrid;
+    backgroundGrid.setColor(QColor("#d3c2a6"));
+    backgroundGrid.setGridLineWidth(0);
+    m_mapView->setBackgroundGrid(backgroundGrid);
+
+    // Set the MGRS grid
+    m_mgrsGrid = new MGRSGrid(this);
+    m_mapView->setGrid(m_mgrsGrid);
+
+    // Handle map clicked
+    connect(m_mapView, &MapQuickView::mouseClicked, this, [this](QMouseEvent& mouseEvent) {
+        Point mapPoint(m_mapView->screenToLocation(mouseEvent.x(), mouseEvent.y()));
+        m_mapView->setViewpointCenter(mapPoint);
+    });
+
     m_mapView->setMap(m_map);
     emit mapViewChanged();
+}
+
+QString GEOINTRecon::mapCenter() const
+{
+    if (nullptr == m_mapView)
+    {
+        return QString("");
+    }
+
+    Geometry mapCenter = m_mapView->currentViewpoint(ViewpointType::CenterAndScale).targetGeometry();
+    switch (mapCenter.geometryType())
+    {
+    case GeometryType::Point:
+        {
+            Point location = static_cast<Point>(mapCenter);
+            const int mgrsPrecision = 5;
+            return CoordinateFormatter::toMgrs(location, MgrsConversionMode::Automatic, mgrsPrecision, true);
+        }
+        break;
+
+    default:
+        return QString("");
+    }
 }
 
 MobilePackageElement* GEOINTRecon::packageElement() const
@@ -83,10 +131,33 @@ OperationalLayerListModel* GEOINTRecon::layerListModel() const
     return m_layerListModel;
 }
 
-void GEOINTRecon::centerMap(const QString &location)
+void GEOINTRecon::addObservation(const QString &location, const QString &minDistance, const QString &maxDistance, const QString &linearUnit, const QString &direction)
+{
+    m_observationFactory->addNewObservation(location, minDistance, maxDistance, linearUnit, direction);
+}
+
+void GEOINTRecon::calculateThreats()
+{
+    Geometry mapCenter = m_mapView->currentViewpoint(ViewpointType::CenterAndScale).targetGeometry();
+    switch (mapCenter.geometryType())
+    {
+    case GeometryType::Point:
+        {
+            Point location = static_cast<Point>(mapCenter);
+
+            // Calculate threats
+            m_threatFactory->calculateThreats(location);
+        }
+        break;
+    default:
+        return;
+    }
+}
+
+void GEOINTRecon::centerMap(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
 {
     RegularLocator locator;
-    WGS84Location wgs84Location = locator.locate(location);
+    WGS84Location wgs84Location = locator.locate(location, distance, linearUnit, direction);
     if (wgs84Location.empty())
     {
         return;
@@ -110,6 +181,9 @@ void GEOINTRecon::showMap()
             LayerListModel* layerListModel = focusMap->operationalLayers();
             m_layerListModel->updateModel(layerListModel);
 
+            // Setup the overlays
+            setupOverlays();
+
             // Iterate features
             //visitMap(focusMap);
         }
@@ -120,6 +194,14 @@ void GEOINTRecon::showMap()
 
     // Emit layer list model changed
     emit layerListModelChanged();
+}
+
+void GEOINTRecon::setupOverlays()
+{
+    m_mapView->graphicsOverlays()->clear();
+
+    m_observationFactory->setupOverlays(*m_mapView);
+    m_threatFactory->setupOverlays(*m_mapView);
 }
 
 void GEOINTRecon::visitMap(Esri::ArcGISRuntime::Map *map) const
@@ -155,9 +237,21 @@ void GEOINTRecon::visitFeatureTable(Esri::ArcGISRuntime::FeatureTable *table) co
                 while (featureIterator.hasNext())
                 {
                     QScopedPointer<Feature> feature(featureIterator.next());
-                    if (!feature->geometry().isEmpty())
+                    Geometry geometry = feature->geometry();
+                    if (!geometry.isEmpty())
                     {
                         geometryCount++;
+
+                        switch (geometry.geometryType())
+                        {
+                        case GeometryType::Point:
+                            {
+                            }
+                            break;
+
+                        default:
+                            break;
+                        }
                     }
                 }
             }

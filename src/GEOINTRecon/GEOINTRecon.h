@@ -22,18 +22,23 @@ class FeatureTable;
 class LayerListModel;
 class Map;
 class MapQuickView;
+class MGRSGrid;
 class MobileMapPackage;
 }
 }
 
 class MobilePackageElement;
 class OperationalLayerListModel;
+class ObservationFactory;
+class ThreatFactory;
 
 #include <QObject>
 
 class GEOINTRecon : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(QString mapCenter READ mapCenter)
 
     Q_PROPERTY(Esri::ArcGISRuntime::MapQuickView* mapView READ mapView WRITE setMapView NOTIFY mapViewChanged)
     Q_PROPERTY(MobilePackageElement* packageElement READ packageElement WRITE setPackageElement NOTIFY packageElementChanged)
@@ -43,7 +48,9 @@ public:
     explicit GEOINTRecon(QObject* parent = nullptr);
     ~GEOINTRecon() override;
 
-    Q_INVOKABLE void centerMap(const QString &location);
+    Q_INVOKABLE void addObservation(const QString &location, const QString &minDistance = "", const QString &maxDistance = "", const QString &linearUnit = "", const QString &direction = "");
+    Q_INVOKABLE void calculateThreats();
+    Q_INVOKABLE void centerMap(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
     Q_INVOKABLE void showMap();
 
 signals:
@@ -55,19 +62,25 @@ private:
     Esri::ArcGISRuntime::MapQuickView* mapView() const;
     void setMapView(Esri::ArcGISRuntime::MapQuickView* mapView);
 
+    QString mapCenter() const;
+
     MobilePackageElement* packageElement() const;
     void setPackageElement(MobilePackageElement* packageElement);
 
     OperationalLayerListModel* layerListModel() const;
 
+    void setupOverlays();
     void visitMap(Esri::ArcGISRuntime::Map* map) const;
     void visitFeatureTable(Esri::ArcGISRuntime::FeatureTable* table) const;
 
     Esri::ArcGISRuntime::Map* m_map = nullptr;
     Esri::ArcGISRuntime::MapQuickView* m_mapView = nullptr;
+    Esri::ArcGISRuntime::MGRSGrid* m_mgrsGrid = nullptr;
     Esri::ArcGISRuntime::MobileMapPackage* m_mobileMapPackage = nullptr;
     MobilePackageElement* m_packageElement = nullptr;
     OperationalLayerListModel* m_layerListModel = nullptr;
+    ObservationFactory* m_observationFactory = nullptr;
+    ThreatFactory* m_threatFactory = nullptr;
 };
 
 #endif // GEOINTRECON_H

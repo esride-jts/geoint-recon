@@ -24,14 +24,23 @@ Item {
 
     signal onNavigateHome()
 
+    function addObservation() {
+        model.addObservation(locationTextField.text, minDistanceField.text, maxDistanceField.text, observeUnitBox.currentText, observeDirectionBox.currentText);
+    }
+
+    function centerMap() {
+        model.centerMap(locationTextField.text, distanceField.text, linearUnitBox.currentText, directionBox.currentText);
+    }
+
     function showMobilePackageElement(packageElement) {
         model.packageElement = packageElement;
         model.showMap();
     }
 
     ColumnLayout {
-        spacing: 10
         anchors.fill: parent
+        anchors.margins: 10
+        spacing: 10
 
         Label {
             id: titleLabel
@@ -46,23 +55,76 @@ Item {
             Layout.fillWidth: true
 
             ListModel {
-                id: layerModel
-                ListElement { title: "1.jpg"; imageName: "flower" }
-                ListElement { title: "2.jpg"; imageName: "house" }
-                ListElement { title: "3.jpg"; imageName: "water" }
+                id: layerModel                
+                ListElement { title: "1.jpg"; visible: true }
+                ListElement { title: "2.jpg"; visible: true }
+                ListElement { title: "3.jpg"; visible: true }
+            }
+
+            Component {
+                id: layerComponent
+
+                Item {
+                    height: layerLabel.height + 20
+                    width: parent.width
+
+                    Component.onCompleted: {
+                        // Initialize the checkbox using the layer visibility
+                        layerCheckbox.checked = layerListView.model.layerVisibility(index);
+                    }
+
+                    RowLayout {
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        CheckBox {
+                            id: layerCheckbox
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    // The user affected click destroys the binding!
+                                    layerCheckbox.checked = !layerCheckbox.checked;
+
+                                    // Directly update the layer visibility using a discret invokable method
+                                    layerListView.model.setLayerVisibility(index, layerCheckbox.checked);
+                                }
+                            }
+                        }
+
+                        Label {
+                            id: layerLabel
+                            text: title
+                        }
+
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                        onClicked: {
+                            if (index === layerListView.currentIndex) {
+                                mouse.accepted = false;
+                            }
+                            else {
+                                layerListView.currentIndex = index;
+                            }
+                        }
+                    }
+                }
             }
 
             ListView {
+                id: layerListView
+                //model: layerModel
                 model: model.layerListModel
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.maximumWidth: 175
+                Layout.minimumWidth: 100
+                Layout.maximumWidth: 300
+                highlight: Rectangle { color: "#616847"; radius: 5 }
+                focus: true
 
-                delegate: Label {
-                    //horizontalAlignment: "AlignHCenter"
-                    Layout.fillWidth: true
-                    text: title
-                }
+                delegate: layerComponent
             }
 
             // Create MapQuickView here, and create its Map etc. in C++ code
@@ -70,17 +132,178 @@ Item {
                 id: view
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                Layout.preferredHeight: 300
+                Layout.preferredWidth: 300
                 // set focus to enable keyboard navigation
                 focus: true
+
+                onViewpointChanged: {
+                    // Update the location using the center of the current map extent
+                    locationTextField.text = model.mapCenter;
+                }
             }
         }
 
-        Button {
-            id: locateButton
-            text: "Locate"
-            Layout.fillWidth: true
+        RowLayout {
+            spacing: 30
 
-            onClicked: model.centerMap("33UUT 10031 45848")
+            TextField {
+                id: locationTextField
+                Layout.fillWidth: true
+                text: "33UUT 10031 45848"
+
+                Keys.onReturnPressed: {
+                    model.centerMap(locationTextField.text);
+                }
+            }
+
+            TextField {
+                id: distanceField
+                Layout.maximumWidth: 100
+                text: "0"
+                validator: DoubleValidator {
+                    bottom: 0
+                    top: 10000
+                }
+
+                Keys.onReturnPressed: {
+                    centerMap();
+                }
+            }
+
+            ComboBox {
+                id: linearUnitBox
+                Layout.maximumWidth: 100
+                model: ListModel {
+                   ListElement { text: "km" }
+                   ListElement { text: "m" }
+                   ListElement { text: "mi" }
+                   ListElement { text: "nm" }
+                   ListElement { text: "ft" }
+                }
+            }
+
+            ComboBox {
+                id: directionBox
+                Layout.maximumWidth: 100
+                model: ListModel {
+                   ListElement { text: "N" }
+                   ListElement { text: "NNE" }
+                   ListElement { text: "NE" }
+                   ListElement { text: "ENE" }
+                   ListElement { text: "E" }
+                   ListElement { text: "ESE" }
+                   ListElement { text: "SE" }
+                   ListElement { text: "SSE" }
+                   ListElement { text: "S" }
+                   ListElement { text: "SSW" }
+                   ListElement { text: "SW" }
+                   ListElement { text: "WSW" }
+                   ListElement { text: "W" }
+                   ListElement { text: "WNW" }
+                   ListElement { text: "NW" }
+                   ListElement { text: "NNW" }
+                }
+            }
+
+            Button {
+                id: locateButton
+                text: "Locate"
+
+                onClicked: {
+                    centerMap();
+                }
+
+                Keys.onReturnPressed: {
+                    centerMap();
+                }
+            }
+
+            Button {
+                text: "IED Threats"
+
+                onClicked: model.calculateThreats()
+                Keys.onReturnPressed: model.calculateThreats()
+            }
+        }
+
+        RowLayout {
+            spacing: 30
+
+            TextField {
+                id: minDistanceField
+                Layout.maximumWidth: 100
+                text: "1"
+                validator: DoubleValidator {
+                    bottom: 1
+                    top: 10000
+                }
+
+                Keys.onReturnPressed: {
+                    addObservation();
+                }
+            }
+
+            TextField {
+                id: maxDistanceField
+                Layout.maximumWidth: 100
+                text: "2"
+                validator: DoubleValidator {
+                    bottom: 1
+                    top: 10000
+                }
+
+                Keys.onReturnPressed: {
+                    addObservation();
+                }
+            }
+
+            ComboBox {
+                id: observeUnitBox
+                Layout.maximumWidth: 100
+                model: ListModel {
+                   ListElement { text: "km" }
+                   ListElement { text: "m" }
+                   ListElement { text: "mi" }
+                   ListElement { text: "nm" }
+                   ListElement { text: "ft" }
+                }
+            }
+
+            ComboBox {
+                id: observeDirectionBox
+                Layout.maximumWidth: 100
+                model: ListModel {
+                   ListElement { text: "N" }
+                   ListElement { text: "NNE" }
+                   ListElement { text: "NE" }
+                   ListElement { text: "ENE" }
+                   ListElement { text: "E" }
+                   ListElement { text: "ESE" }
+                   ListElement { text: "SE" }
+                   ListElement { text: "SSE" }
+                   ListElement { text: "S" }
+                   ListElement { text: "SSW" }
+                   ListElement { text: "SW" }
+                   ListElement { text: "WSW" }
+                   ListElement { text: "W" }
+                   ListElement { text: "WNW" }
+                   ListElement { text: "NW" }
+                   ListElement { text: "NNW" }
+                }
+            }
+
+            Button {
+                text: "Observe"
+
+                onClicked: {
+                    addObservation();
+                }
+
+                Keys.onReturnPressed: {
+                    addObservation();
+                }
+            }
         }
 
         Button {
@@ -89,6 +312,7 @@ Item {
             Layout.fillWidth: true
 
             onClicked: mapViewRoot.onNavigateHome()
+            Keys.onReturnPressed: mapViewRoot.onNavigateHome()
         }
 
         // Declare the C++ instance which creates the map etc. and supply the view
