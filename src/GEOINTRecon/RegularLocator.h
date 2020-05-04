@@ -46,7 +46,7 @@ public:
     explicit RegularLocator(QObject *parent = nullptr);
 
     WGS84Location locate(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
-    Esri::ArcGISRuntime::Geometry locateGeometry(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
+    Esri::ArcGISRuntime::Geometry locateGeometry(const QString &location, const QString &minDistance = "", const QString &maxDistance = "", const QString &linearUnit = "", const QString &direction = "");
 
 signals:
 

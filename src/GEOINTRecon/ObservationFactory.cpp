@@ -30,14 +30,14 @@ void ObservationFactory::setupOverlays(const Esri::ArcGISRuntime::MapView &mapVi
     SimpleFillSymbol* symbol = new SimpleFillSymbol(SimpleFillSymbolStyle::Solid, QColorConstants::Red, m_observationOverlay);
     renderer->setSymbol(symbol);
     m_observationOverlay->setRenderer(renderer);
-    m_observationOverlay->setOpacity(0.35);
+    m_observationOverlay->setOpacity(0.35f);
 
     mapView.graphicsOverlays()->append(m_observationOverlay);
 }
 
-void ObservationFactory::addNewObservation(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
+void ObservationFactory::addNewObservation(const QString &location, const QString &minDistance, const QString &maxDistance, const QString &linearUnit, const QString &direction)
 {
-    Geometry observationArea = m_regularLocator->locateGeometry(location, distance, linearUnit, direction);
+    Geometry observationArea = m_regularLocator->locateGeometry(location, minDistance, maxDistance, linearUnit, direction);
     Graphic* observationGraphic = new Graphic(observationArea, m_observationOverlay);
     m_observationOverlay->graphics()->append(observationGraphic);
 }

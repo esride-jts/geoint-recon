@@ -71,7 +71,7 @@ WGS84Location RegularLocator::locate(const QString &location, const QString &dis
     return WGS84Location();
 }
 
-Esri::ArcGISRuntime::Geometry RegularLocator::locateGeometry(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
+Esri::ArcGISRuntime::Geometry RegularLocator::locateGeometry(const QString &location, const QString &minDistance, const QString &maxDistance, const QString &linearUnit, const QString &direction)
 {
     QRegularExpression expression("(\\d{1,2})\\s*([a-zA-Z]{1,3})\\s*(\\d*)\\s*(\\d*)");
     QRegularExpressionMatch match = expression.match(location);
@@ -81,7 +81,7 @@ Esri::ArcGISRuntime::Geometry RegularLocator::locateGeometry(const QString &loca
         if (mgrsLocation.isValid())
         {
             QList<Point> mgrsLocations({mgrsLocation});
-            double distanceAsDouble = distance.toDouble();
+            double distanceAsDouble = 0.5 * (minDistance.toDouble() + maxDistance.toDouble());
             double conversionFactor = 0.0;
             LinearUnit linearUnitAsUnit = toLinearUnit(linearUnit, conversionFactor);
             distanceAsDouble *= conversionFactor;
@@ -92,14 +92,40 @@ Esri::ArcGISRuntime::Geometry RegularLocator::locateGeometry(const QString &loca
             Point targetLocation = targetLocations.first();
             if (targetLocation.isValid())
             {
+                // Calculation of the field of view
+                /*
                 const double maxDeviation = 1e-5;
                 double fieldOfView = 214.0;
+                double fieldOfViewHeight = 140.0;
                 double viewDiameter = 2 * distanceAsDouble * tan(0.5 * fieldOfView);
-                if (viewDiameter < distanceAsDouble)
+                if (1 < viewDiameter)
                 {
                     viewDiameter = distanceAsDouble;
                 }
-                return GeometryEngine::bufferGeodetic(targetLocation, viewDiameter, linearUnitAsUnit, maxDeviation, GeodeticCurveType::Geodesic);
+                */
+
+                double targetHeight = 0.5 * (maxDistance.toDouble() - minDistance.toDouble());
+                double targetWidth = 2.0 * targetHeight;
+                if (50 < linearUnitAsUnit.convertToMeters(targetHeight))
+                {
+                    GeodesicEllipseParameters targetParameters(targetLocation, targetWidth, targetHeight);
+                    double axisDirection = -azimuth;
+                    targetParameters.setAxisDirection(axisDirection);
+                    targetParameters.setLinearUnit(linearUnitAsUnit);
+                    targetParameters.setAngularUnit(AngularUnit::degrees());
+                    return GeometryEngine::ellipseGeodesic(targetParameters);
+                }
+                else
+                {
+                    targetHeight = 50;
+                    targetWidth = 100;
+                    GeodesicEllipseParameters targetParameters(targetLocation, targetWidth, targetHeight);
+                    double axisDirection = -azimuth;
+                    targetParameters.setAxisDirection(axisDirection);
+                    targetParameters.setLinearUnit(LinearUnit::meters());
+                    targetParameters.setAngularUnit(AngularUnit::degrees());
+                    return GeometryEngine::ellipseGeodesic(targetParameters);
+                }
             }
         }
     }

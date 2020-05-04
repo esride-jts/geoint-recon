@@ -25,7 +25,7 @@ Item {
     signal onNavigateHome()
 
     function addObservation() {
-        model.addObservation(locationTextField.text, distanceField.text, linearUnitBox.currentText, directionBox.currentText);
+        model.addObservation(locationTextField.text, minDistanceField.text, maxDistanceField.text, observeUnitBox.currentText, observeDirectionBox.currentText);
     }
 
     function centerMap() {
@@ -220,6 +220,80 @@ Item {
             }
 
             Button {
+                text: "IED Threats"
+
+                onClicked: model.calculateThreats()
+                Keys.onReturnPressed: model.calculateThreats()
+            }
+        }
+
+        RowLayout {
+            spacing: 30
+
+            TextField {
+                id: minDistanceField
+                Layout.maximumWidth: 100
+                text: "1"
+                validator: DoubleValidator {
+                    bottom: 1
+                    top: 10000
+                }
+
+                Keys.onReturnPressed: {
+                    addObservation();
+                }
+            }
+
+            TextField {
+                id: maxDistanceField
+                Layout.maximumWidth: 100
+                text: "2"
+                validator: DoubleValidator {
+                    bottom: 1
+                    top: 10000
+                }
+
+                Keys.onReturnPressed: {
+                    addObservation();
+                }
+            }
+
+            ComboBox {
+                id: observeUnitBox
+                Layout.maximumWidth: 100
+                model: ListModel {
+                   ListElement { text: "km" }
+                   ListElement { text: "m" }
+                   ListElement { text: "mi" }
+                   ListElement { text: "nm" }
+                   ListElement { text: "ft" }
+                }
+            }
+
+            ComboBox {
+                id: observeDirectionBox
+                Layout.maximumWidth: 100
+                model: ListModel {
+                   ListElement { text: "N" }
+                   ListElement { text: "NNE" }
+                   ListElement { text: "NE" }
+                   ListElement { text: "ENE" }
+                   ListElement { text: "E" }
+                   ListElement { text: "ESE" }
+                   ListElement { text: "SE" }
+                   ListElement { text: "SSE" }
+                   ListElement { text: "S" }
+                   ListElement { text: "SSW" }
+                   ListElement { text: "SW" }
+                   ListElement { text: "WSW" }
+                   ListElement { text: "W" }
+                   ListElement { text: "WNW" }
+                   ListElement { text: "NW" }
+                   ListElement { text: "NNW" }
+                }
+            }
+
+            Button {
                 text: "Observe"
 
                 onClicked: {
@@ -229,23 +303,6 @@ Item {
                 Keys.onReturnPressed: {
                     addObservation();
                 }
-            }
-        }
-
-        RowLayout {
-            spacing: 30
-
-            Button {
-                text: "IED Threats"
-
-                onClicked: model.calculateThreats()
-                Keys.onReturnPressed: model.calculateThreats()
-            }
-
-            Button {
-                text: "..."
-
-                enabled: false
             }
         }
 

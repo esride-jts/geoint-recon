@@ -131,9 +131,9 @@ OperationalLayerListModel* GEOINTRecon::layerListModel() const
     return m_layerListModel;
 }
 
-void GEOINTRecon::addObservation(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
+void GEOINTRecon::addObservation(const QString &location, const QString &minDistance, const QString &maxDistance, const QString &linearUnit, const QString &direction)
 {
-    m_observationFactory->addNewObservation(location, distance, linearUnit, direction);
+    m_observationFactory->addNewObservation(location, minDistance, maxDistance, linearUnit, direction);
 }
 
 void GEOINTRecon::calculateThreats()

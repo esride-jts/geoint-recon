@@ -23,7 +23,7 @@ public:
 
     void setupOverlays(const Esri::ArcGISRuntime::MapView &mapView);
 
-    void addNewObservation(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
+    void addNewObservation(const QString &location, const QString &minDistance = "", const QString &maxDistance = "", const QString &linearUnit = "", const QString &direction = "");
 
 signals:
 
