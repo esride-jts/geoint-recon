@@ -27,6 +27,7 @@
 
 #include "CoordinateFormatter.h"
 #include "GeometryEngine.h"
+#include "LocatorTask.h"
 
 #include <QtMath>
 #include <QRegularExpression>
@@ -36,6 +37,35 @@ using namespace Esri::ArcGISRuntime;
 RegularLocator::RegularLocator(QObject *parent) : QObject(parent)
 {
 
+}
+
+void RegularLocator::setupLocatorTask(Esri::ArcGISRuntime::LocatorTask *locatorTask)
+{
+    if (nullptr != m_locatorTask)
+    {
+        delete m_locatorContext;
+    }
+
+    m_locatorTask = locatorTask;
+
+    if (nullptr != m_locatorTask)
+    {
+        m_locatorContext = new QObject();
+        connect(m_locatorTask, &LocatorTask::geocodeCompleted, m_locatorContext, [this](QUuid, const QList<GeocodeResult>& results)
+        {
+            if (results.empty())
+            {
+                return;
+            }
+
+            GeocodeResult geocodeResult = results.first();
+            Point targetLocation = geocodeResult.displayLocation();
+            if (targetLocation.isValid())
+            {
+                emit onLocated(WGS84Location(targetLocation.y(), targetLocation.x()));
+            }
+        });
+    }
 }
 
 WGS84Location RegularLocator::locate(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
@@ -66,6 +96,12 @@ WGS84Location RegularLocator::locate(const QString &location, const QString &dis
                 return WGS84Location(mgrsLocation.y(), mgrsLocation.x());
             }
         }
+    }
+    else if (nullptr != m_locatorTask)
+    {
+        GeocodeParameters geocodeParameters;
+        geocodeParameters.setOutputSpatialReference(SpatialReference::wgs84());
+        m_locatorTask->geocodeWithParameters(location, geocodeParameters);
     }
 
     return WGS84Location();

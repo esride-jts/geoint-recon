@@ -44,6 +44,7 @@ GEOINTRecon::GEOINTRecon(QObject* parent /* = nullptr */):
     m_map(new Map(Basemap::openStreetMap(this), this)),
     m_layerListModel(new OperationalLayerListModel(this)),
     m_observationFactory(new ObservationFactory(this)),
+    m_regularLocator(new RegularLocator(this)),
     m_threatFactory(new ThreatFactory(this))
 {
 }
@@ -81,6 +82,12 @@ void GEOINTRecon::setMapView(MapQuickView* mapView)
     connect(m_mapView, &MapQuickView::mouseClicked, this, [this](QMouseEvent& mouseEvent) {
         Point mapPoint(m_mapView->screenToLocation(mouseEvent.x(), mouseEvent.y()));
         m_mapView->setViewpointCenter(mapPoint);
+    });
+
+    connect(m_regularLocator, &RegularLocator::onLocated, this, [this](WGS84Location wgs84Location)
+    {
+        Point mapCenter(wgs84Location.longitude(), wgs84Location.latitude(), SpatialReference::wgs84());
+        m_mapView->setViewpointCenter(mapCenter);
     });
 
     m_mapView->setMap(m_map);
@@ -156,8 +163,7 @@ void GEOINTRecon::calculateThreats()
 
 void GEOINTRecon::centerMap(const QString &location, const QString &distance, const QString &linearUnit, const QString &direction)
 {
-    RegularLocator locator;
-    WGS84Location wgs84Location = locator.locate(location, distance, linearUnit, direction);
+    WGS84Location wgs84Location = m_regularLocator->locate(location, distance, linearUnit, direction);
     if (wgs84Location.empty())
     {
         return;
@@ -184,6 +190,9 @@ void GEOINTRecon::showMap()
             // Setup the overlays
             setupOverlays();
 
+            // Setup tasks
+            setupTasks();
+
             // Iterate features
             //visitMap(focusMap);
         }
@@ -202,6 +211,14 @@ void GEOINTRecon::setupOverlays()
 
     m_observationFactory->setupOverlays(*m_mapView);
     m_threatFactory->setupOverlays(*m_mapView);
+}
+
+void GEOINTRecon::setupTasks()
+{
+    if (nullptr != m_packageElement)
+    {
+        m_regularLocator->setupLocatorTask(m_packageElement->locatorTask());
+    }
 }
 
 void GEOINTRecon::visitMap(Esri::ArcGISRuntime::Map *map) const

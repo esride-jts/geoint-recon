@@ -32,6 +32,7 @@ namespace ArcGISRuntime
 {
 class Geometry;
 class LinearUnit;
+class LocatorTask;
 }
 }
 
@@ -45,14 +46,20 @@ class RegularLocator : public QObject
 public:
     explicit RegularLocator(QObject *parent = nullptr);
 
+    void setupLocatorTask(Esri::ArcGISRuntime::LocatorTask *locatorTask);
+
     WGS84Location locate(const QString &location, const QString &distance = "", const QString &linearUnit = "", const QString &direction = "");
     Esri::ArcGISRuntime::Geometry locateGeometry(const QString &location, const QString &minDistance = "", const QString &maxDistance = "", const QString &linearUnit = "", const QString &direction = "");
 
 signals:
+    void onLocated(WGS84Location newLocation);
 
 private:
     double toDegrees(const QString &direction) const;
     Esri::ArcGISRuntime::LinearUnit toLinearUnit(const QString &linearUnit, double &conversionFactor) const;
+
+    QObject* m_locatorContext;
+    Esri::ArcGISRuntime::LocatorTask* m_locatorTask = nullptr;
 };
 
 #endif // REGULARLOCATOR_H

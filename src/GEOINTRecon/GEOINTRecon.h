@@ -30,6 +30,7 @@ class MobileMapPackage;
 class MobilePackageElement;
 class OperationalLayerListModel;
 class ObservationFactory;
+class RegularLocator;
 class ThreatFactory;
 
 #include <QObject>
@@ -70,6 +71,8 @@ private:
     OperationalLayerListModel* layerListModel() const;
 
     void setupOverlays();
+    void setupTasks();
+
     void visitMap(Esri::ArcGISRuntime::Map* map) const;
     void visitFeatureTable(Esri::ArcGISRuntime::FeatureTable* table) const;
 
@@ -80,6 +83,7 @@ private:
     MobilePackageElement* m_packageElement = nullptr;
     OperationalLayerListModel* m_layerListModel = nullptr;
     ObservationFactory* m_observationFactory = nullptr;
+    RegularLocator* m_regularLocator = nullptr;
     ThreatFactory* m_threatFactory = nullptr;
 };
 

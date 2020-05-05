@@ -7,6 +7,7 @@ namespace Esri
 {
 namespace ArcGISRuntime
 {
+class LocatorTask;
 class Map;
 class MobileMapPackage;
 }
@@ -27,6 +28,7 @@ public:
     QString description() const;
 
     Esri::ArcGISRuntime::Map* focusMap() const;
+    Esri::ArcGISRuntime::LocatorTask* locatorTask() const;
 
 signals:
     void onTitleChanged();

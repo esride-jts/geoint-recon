@@ -39,3 +39,8 @@ Esri::ArcGISRuntime::Map* MobilePackageElement::focusMap() const
 
     return m_mobileMapPackage->maps().at(0);
 }
+
+Esri::ArcGISRuntime::LocatorTask* MobilePackageElement::locatorTask() const
+{
+    return m_mobileMapPackage->locatorTask();
+}
