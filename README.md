@@ -1,6 +1,10 @@
 # geoint-recon
 Sample native desktop application for geospatial intelligence workflows.
 
+## Deployment
+Create a directory named geoint-recon into the %USERPROFILE% path and copy the mobile map packages (mmpk file extension) into a new subdirectory named data.
+Start the GEOINTRecon Desktop app.
+
 ## Software requirements
 - [ArcGIS Runtime Qt](https://developers.arcgis.com/qt/) Version 100.7
 
