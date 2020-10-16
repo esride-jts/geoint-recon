@@ -21,15 +21,15 @@ QT += opengl qml quick quickcontrols2
 TARGET = GEOINTRecon
 
 equals(QT_MAJOR_VERSION, 5) {
-    lessThan(QT_MINOR_VERSION, 12) { 
-        error("$$TARGET requires Qt 5.12.0")
+    lessThan(QT_MINOR_VERSION, 15) {
+        error("$$TARGET requires Qt 5.15.0")
     }
-	equals(QT_MINOR_VERSION, 12) : lessThan(QT_PATCH_VERSION, 0) {
-		error("$$TARGET requires Qt 5.12.0")
+        equals(QT_MINOR_VERSION, 15) : lessThan(QT_PATCH_VERSION, 0) {
+                error("$$TARGET requires Qt 5.15.0")
 	}
 }
 
-ARCGIS_RUNTIME_VERSION = 100.7
+ARCGIS_RUNTIME_VERSION = 100.9
 include($$PWD/arcgisruntime.pri)
 
 HEADERS += \
