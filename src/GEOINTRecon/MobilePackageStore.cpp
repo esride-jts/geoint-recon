@@ -28,6 +28,8 @@
 #include "MobilePackageStore.h"
 #include "MobilePackageElement.h"
 
+#include <QProcessEnvironment>
+
 using namespace Esri::ArcGISRuntime;
 
 MobilePackageStore::MobilePackageStore(QObject *parent) : QAbstractListModel(parent)
@@ -37,18 +39,38 @@ MobilePackageStore::MobilePackageStore(QObject *parent) : QAbstractListModel(par
 
 QFileInfoList MobilePackageStore::packageInfos() const
 {
-    QDir directory = QDir::home();
-    directory.cd("geoint-recon");
-    directory.cd("data");
-    if (directory.exists())
+    QString datapathKeyName = "geoint.datapath";
+    QProcessEnvironment systemEnvironment = QProcessEnvironment::systemEnvironment();
+    if (systemEnvironment.contains(datapathKeyName))
     {
-        directory.setFilter(QDir::Files);
-        directory.setNameFilters(QStringList() << "*.mmpk");
-        return directory.entryInfoList();
+        QString datapathValue = systemEnvironment.value(datapathKeyName);
+        QDir dataDirectory(datapathValue);
+        if (dataDirectory.exists())
+        {
+            dataDirectory.setFilter(QDir::Files);
+            dataDirectory.setNameFilters(QStringList() << "*.mmpk");
+            return dataDirectory.entryInfoList();
+        }
+        else
+        {
+            return QFileInfoList();
+        }
     }
     else
     {
-        return QFileInfoList();
+        QDir homeDirectory = QDir::home();
+        homeDirectory.cd("geoint-recon");
+        homeDirectory.cd("data");
+        if (homeDirectory.exists())
+        {
+            homeDirectory.setFilter(QDir::Files);
+            homeDirectory.setNameFilters(QStringList() << "*.mmpk");
+            return homeDirectory.entryInfoList();
+        }
+        else
+        {
+            return QFileInfoList();
+        }
     }
 }
 
